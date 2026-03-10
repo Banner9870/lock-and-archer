@@ -33,6 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# sqlite (local dev; production uses Railway volume)
+app.db
+app.db-shm
+app.db-wal
+
 # vercel
 .vercel
 
