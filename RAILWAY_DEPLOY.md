@@ -46,7 +46,7 @@ Your app uses SQLite for session storage, which needs persistent disk storage.
 
 **Important notes:**
 
-- `PUBLIC_URL` must include `https://` and have no trailing slash
+- `PUBLIC_URL` must be a full origin: include `https://` and have no trailing slash (e.g. `https://your-app-name.up.railway.app`). If you set only the hostname, the app will prefix `https://` for you.
 - `PRIVATE_KEY` should be the full JSON object (e.g., `{"kty":"EC","kid":"...","crv":"P-256",...}`)
 
 ## Step 5: Redeploy

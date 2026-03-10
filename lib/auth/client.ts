@@ -16,8 +16,22 @@ export const SCOPE = "atproto";
 
 let client: NodeOAuthClient | null = null;
 
-const PUBLIC_URL = process.env.PUBLIC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+/** PUBLIC_URL must be a full origin (e.g. https://your-app.up.railway.app) with no trailing slash. */
+function getPublicUrl(): string | undefined {
+  const raw = process.env.PUBLIC_URL?.trim();
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+    return url.origin;
+  } catch {
+    return undefined;
+  }
+}
+
+const PUBLIC_URL = getPublicUrl();
 
 function getClientMetadata(): OAuthClientMetadataInput {
   if (PUBLIC_URL) {
@@ -81,8 +95,7 @@ export async function getOAuthClient(): Promise<NodeOAuthClient> {
     },
 
     sessionStore: {
-      async get(key: string) {
-        const db = getDb();
+      async get(key: string) {        const db = getDb();
         const row = await db
           .selectFrom("auth_session")
           .select("value")
