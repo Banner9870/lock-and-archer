@@ -54,13 +54,25 @@ export default async function GuideDetailPage({ params }: PageProps) {
   const session = await getSession();
   const isOwner = session?.did === guide.authorDid;
 
-  const itemsWithGeo: ItemWithGeo[] = items.filter(
-    (i): i is ItemWithGeo =>
-      i.latitude != null &&
-      i.longitude != null &&
-      typeof i.latitude === "number" &&
-      typeof i.longitude === "number"
-  );
+  const itemsWithGeo: ItemWithGeo[] = items
+    .filter(
+      (i): i is typeof i & { latitude: number; longitude: number } =>
+        i.latitude != null &&
+        i.longitude != null &&
+        typeof i.latitude === "number" &&
+        typeof i.longitude === "number"
+    )
+    .map((i) => ({
+      uri: i.uri,
+      guideUri: i.guideUri,
+      type: i.type,
+      title: i.title,
+      description: i.description,
+      sourceLabel: i.sourceLabel,
+      latitude: i.latitude,
+      longitude: i.longitude,
+      neighborhoodId: i.neighborhoodId,
+    }));
 
   return (
     <>

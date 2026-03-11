@@ -88,7 +88,7 @@ async function pdsPostBlob(
       Authorization: `Bearer ${accessJwt}`,
       "Content-Type": mimeType,
     },
-    body,
+    body: new Uint8Array(body),
   });
   if (!res.ok) {
     const text = await res.text();

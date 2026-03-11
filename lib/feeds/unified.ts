@@ -137,7 +137,7 @@ export async function getFollowedDids(actorDid: string): Promise<string[]> {
   if (!res.ok) return [];
   const data = (await res.json()) as { follows?: { did?: string }[] };
   const follows = data.follows ?? [];
-  return follows.map((f) => f.did).filter(Boolean);
+  return follows.map((f) => f.did).filter((d): d is string => typeof d === "string");
 }
 
 /** Following feed for a user: fetches follow list from PDS then guides from DB. */

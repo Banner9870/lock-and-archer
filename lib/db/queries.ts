@@ -315,8 +315,8 @@ export async function listItemsWithGeo(limit = 500) {
   return db
     .selectFrom("guide_item")
     .selectAll()
-    .where(sql`latitude IS NOT NULL`)
-    .where(sql`longitude IS NOT NULL`)
+    .where("latitude", "is not", null)
+    .where("longitude", "is not", null)
     .orderBy("indexedAt", "desc")
     .limit(limit)
     .execute();
