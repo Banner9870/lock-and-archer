@@ -43,6 +43,7 @@ Your app uses SQLite for session storage, which needs persistent disk storage.
 | `DATABASE_PATH`| `/data/app.db`                         |
 | `PUBLIC_URL`   | `https://your-app-name.up.railway.app` |
 | `PRIVATE_KEY`  | The JSON key from `pnpm gen-key`       |
+| `PDS_APP_URL`  | *(Optional)* If using a test PDS: full PDS URL (e.g. `https://lock-and-archer-pds-production.up.railway.app`) so handle resolution works without wildcard DNS |
 
 **Important notes:**
 
@@ -52,3 +53,14 @@ Your app uses SQLite for session storage, which needs persistent disk storage.
 ## Step 5: Redeploy
 
 After setting environment variables, Railway will automatically redeploy. Once complete, visit your domain to test the OAuth flow.
+
+## Optional: Test PDS for Statusphere
+
+To test status updates (and avoid “Unable to fulfill XRPC request” from bsky.social), you can run your own PDS with pre-created test accounts.
+
+A **Railway-deployable test PDS** lives in the `pds` folder at the repo root (or in a separate repo). It uses the [official Bluesky PDS](https://github.com/bluesky-social/pds) image and on first run creates 3 test users (`alice.*`, `bob.*`, `carol.*`, password: `testpass123`).
+
+1. Deploy the PDS (see `pds/README.md`): push the `pds` folder to a new GitHub repo, deploy on Railway with a volume at `/pds`, set `PDS_HOSTNAME`, `PDS_JWT_SECRET`, `PDS_ADMIN_PASSWORD`, and `PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX`.
+2. **In this app (Lock and Archer), set `PDS_APP_URL`** to your PDS's full URL so login works without wildcard DNS (e.g. `https://lock-and-archer-pds-production.up.railway.app`). Railway's default domain is a single hostname, so the standard handle resolution (which uses the handle as the hostname for `/.well-known/atproto-did`) fails; `PDS_APP_URL` makes the app resolve handles for that PDS via its XRPC `resolveHandle` instead.
+3. Sign in with a handle like `alice.lock-and-archer-pds-production.up.railway.app` (the handle must match your PDS hostname exactly).
+4. Set status from the Statusphere UI; the self-hosted PDS accepts the custom `xyz.statusphere.status` lexicon.

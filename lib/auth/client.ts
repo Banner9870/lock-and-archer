@@ -9,10 +9,13 @@ import type {
   NodeSavedState,
   OAuthClientMetadataInput,
 } from "@atproto/oauth-client-node";
+import type { HandleResolver } from "@atproto-labs/handle-resolver";
+import { XrpcHandleResolver } from "@atproto-labs/handle-resolver";
+import { AtprotoHandleResolverNode } from "@atproto-labs/handle-resolver-node";
 
 import { getDb } from "@/lib/db";
 
-export const SCOPE = "atproto";
+export const SCOPE = "atproto repo:xyz.statusphere.status";
 
 let client: NodeOAuthClient | null = null;
 
@@ -32,6 +35,41 @@ function getPublicUrl(): string | undefined {
 }
 
 const PUBLIC_URL = getPublicUrl();
+
+/** Optional. When set, handles under this PDS host (e.g. alice.lock-and-archer-pds-production.up.railway.app) are resolved via the PDS XRPC instead of .well-known, so login works without wildcard DNS. */
+function getPdsAppUrl(): URL | undefined {
+  const raw = process.env.PDS_APP_URL?.trim();
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+    return url;
+  } catch {
+    return undefined;
+  }
+}
+
+const PDS_APP_URL = getPdsAppUrl();
+
+/** Handle resolver that uses the configured PDS XRPC for handles on that host, and default (.well-known) for others. */
+function createHandleResolver(): HandleResolver | undefined {
+  if (!PDS_APP_URL) return undefined;
+  const pdsHostname = PDS_APP_URL.hostname.toLowerCase();
+  const xrpcResolver = new XrpcHandleResolver(PDS_APP_URL);
+  const defaultResolver = new AtprotoHandleResolverNode({});
+
+  return {
+    async resolve(handle, options) {
+      const domain =
+        handle.includes(".") ? handle.slice(handle.indexOf(".") + 1) : handle;
+      const usePds = domain === pdsHostname || handle.toLowerCase() === pdsHostname;
+      if (usePds) {
+        return xrpcResolver.resolve(handle, options);
+      }
+      return defaultResolver.resolve(handle, options);
+    },
+  };
+}
 
 function getClientMetadata(): OAuthClientMetadataInput {
   if (PUBLIC_URL) {
@@ -65,9 +103,12 @@ async function getKeyset(): Promise<Keyset | undefined> {
 export async function getOAuthClient(): Promise<NodeOAuthClient> {
   if (client) return client;
 
+  const handleResolver = createHandleResolver();
+
   client = new NodeOAuthClient({
     clientMetadata: getClientMetadata(),
     keyset: await getKeyset(),
+    ...(handleResolver && { handleResolver }),
 
     stateStore: {
       async get(key: string) {
