@@ -43,10 +43,13 @@ export function LoginForm() {
           type="text"
           value={handle}
           onChange={(e) => setHandle(e.target.value)}
-          placeholder="user.example.com"
+          placeholder="alice.your-pds.up.railway.app"
           className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
           disabled={loading}
         />
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          Use your full handle; for a test PDS it must match the PDS hostname (e.g. alice.lock-and-archer-pds-production.up.railway.app).
+        </p>
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}

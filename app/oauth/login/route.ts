@@ -22,8 +22,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ redirectUrl: authUrl.toString() });
   } catch (error) {
     console.error("OAuth login error:", error);
+    const message = error instanceof Error ? error.message : "Login failed";
+    // Help users who use the wrong handle (e.g. README example vs their actual PDS hostname)
+    const hint =
+      message.includes("Failed to resolve identity") || message.includes("resolve identity")
+        ? " Use the handle that matches your PDS hostname (e.g. alice.your-pds-hostname.up.railway.app). See the PDS README troubleshooting section."
+        : "";
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Login failed" },
+      { error: message + hint },
       { status: 500 }
     );
   }
