@@ -49,24 +49,67 @@ function getPdsAppUrl(): URL | undefined {
   }
 }
 
-const PDS_APP_URL = getPdsAppUrl();
+// Resolve PDS URL when creating the resolver (at first OAuth use), not at module load, so env is available in Next.js server context.
+let pdsUrlLogged = false;
 
-/** Handle resolver that uses the configured PDS XRPC for handles on that host, and default (.well-known) for others. */
+/**
+ * Optional fallback for one PDS: when standard handle resolution fails (e.g. Railway
+ * single hostname, no wildcard), try that PDS's resolveHandle XRPC. The app supports
+ * any AT Protocol PDS (bsky.social, your own, etc.); PDS_APP_URL is only used as a
+ * fallback for handles on that host when default resolution fails.
+ */
 function createHandleResolver(): HandleResolver | undefined {
-  if (!PDS_APP_URL) return undefined;
-  const pdsHostname = PDS_APP_URL.hostname.toLowerCase();
-  const xrpcResolver = new XrpcHandleResolver(PDS_APP_URL);
+  const pdsAppUrl = getPdsAppUrl();
+  if (!pdsAppUrl) return undefined;
+
+  if (process.env.NODE_ENV !== "test" && !pdsUrlLogged) {
+    pdsUrlLogged = true;
+    console.log("[Lock and Archer] PDS_APP_URL is set; fallback handle resolution enabled for host:", pdsAppUrl.hostname);
+  }
+
+  const pdsHostname = pdsAppUrl.hostname.toLowerCase();
+  const xrpcResolver = new XrpcHandleResolver(pdsAppUrl);
   const defaultResolver = new AtprotoHandleResolverNode({});
 
   return {
     async resolve(handle, options) {
       const domain =
         handle.includes(".") ? handle.slice(handle.indexOf(".") + 1) : handle;
-      const usePds = domain === pdsHostname || handle.toLowerCase() === pdsHostname;
-      if (usePds) {
-        return xrpcResolver.resolve(handle, options);
+      const matchesPdsHost =
+        domain === pdsHostname || handle.toLowerCase() === pdsHostname;
+
+      let result;
+      try {
+        result = await defaultResolver.resolve(handle, options);
+        if (result != null) return result;
+      } catch {
+        // Default resolution failed (e.g. no wildcard DNS); try PDS fallback if applicable.
       }
-      return defaultResolver.resolve(handle, options);
+
+      if (matchesPdsHost) {
+        try {
+          console.log("[Lock and Archer] Trying PDS fallback for handle:", handle);
+          result = await xrpcResolver.resolve(handle, options);
+          if (result != null) {
+            console.log("[Lock and Archer] PDS fallback resolved handle to DID");
+            return result;
+          }
+        } catch (err) {
+          console.error("[Lock and Archer] PDS fallback failed for handle", handle, err);
+          // Log raw PDS response for debugging
+          try {
+            const resolveUrl = new URL("/xrpc/com.atproto.identity.resolveHandle", pdsAppUrl);
+            resolveUrl.searchParams.set("handle", handle);
+            const res = await fetch(resolveUrl, { redirect: "error" });
+            const text = await res.text();
+            console.error("[Lock and Archer] PDS resolveHandle response:", res.status, text.slice(0, 500));
+          } catch (fetchErr) {
+            console.error("[Lock and Archer] Could not fetch PDS resolveHandle:", fetchErr);
+          }
+          // Fall through to return null
+        }
+      }
+      return null;
     },
   };
 }
