@@ -7,9 +7,8 @@ import {
   listRecentGuides,
   listGuidesByAuthor,
 } from "@/lib/db/queries";
-import { isCreateAccountAvailable } from "@/lib/config";
+import { isCreateAccountAvailable, isStatusphereEnabled } from "@/lib/config";
 import { LoginForm } from "@/components/LoginForm";
-import { LogoutButton } from "@/components/LogoutButton";
 import { StatusPicker } from "@/components/StatusPicker";
 import Link from "next/link";
 
@@ -20,25 +19,27 @@ type HomeProps = {
 export default async function Home({ searchParams }: HomeProps) {
   const session = await getSession();
   const params = await searchParams;
-  const accountCreated = params.account_created && String(params.account_created).trim() ? String(params.account_created).trim() : undefined;
+  const accountCreated =
+    params.account_created && String(params.account_created).trim()
+      ? String(params.account_created).trim()
+      : undefined;
 
   const [
     statuses,
     topStatuses,
     accountStatus,
-    accountHandle,
     recentGuides,
     myGuides,
   ] = await Promise.all([
     getRecentStatuses(5),
     getTopStatuses(10),
     session ? getAccountStatus(session.did) : null,
-    session ? getAccountHandle(session.did) : null,
     listRecentGuides(10),
     session ? listGuidesByAuthor(session.did, 20) : [],
   ]);
 
   const createAccountAvailable = isCreateAccountAvailable();
+  const statusphereEnabled = isStatusphereEnabled();
 
   const recentGuidesWithHandles = await Promise.all(
     recentGuides.map(async (g) => ({
@@ -56,191 +57,242 @@ export default async function Home({ searchParams }: HomeProps) {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-      <main className="w-full max-w-md mx-auto p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-            Lock & Archer
-          </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Community guides and local storytelling
-          </p>
-        </div>
+    <>
+      <div className="text-center mb-8">
+        <h1
+          className="font-heading text-3xl font-bold mb-2"
+          style={{ color: "var(--text-headline)" }}
+        >
+          Lock & Archer
+        </h1>
+        <p
+          className="text-sm"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Community guides, local storytelling, and your feed of articles and events
+        </p>
+      </div>
 
-        {session ? (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Signed in as @{accountHandle ?? session.did}
-              </p>
-              <LogoutButton />
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/guides"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                Guides
-              </Link>
-              <Link
-                href="/guides/new"
-                className="inline-flex items-center justify-center rounded-md bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-3 py-1.5 text-sm font-medium"
-              >
-                Create a guide
-              </Link>
-            </div>
-            <StatusPicker currentStatus={accountStatus?.status} />
-          </div>
-        ) : (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            {accountCreated && (
-              <p className="mb-4 text-sm text-green-600 dark:text-green-400">
-                Account created. Sign in with your new handle below.
-              </p>
-            )}
-            <LoginForm defaultHandle={accountCreated} />
-            {createAccountAvailable && (
-              <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                Don&apos;t have an account?{" "}
-                <Link href="/create-account" className="text-blue-600 dark:text-blue-400 hover:underline">
-                  Create one
-                </Link>
-              </p>
-            )}
-          </div>
-        )}
-
-        {session && myGuidesWithHandles.length === 0 && (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">
-              My guides
-            </h3>
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-3">
-              You haven&apos;t created any guides yet. Start your first guide to collect articles, events, and places.
-            </p>
-            <Link
-              href="/guides/new"
-              className="inline-flex items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-600 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+      {!session && (
+        <div className="feed-card p-6 mb-6">
+          {accountCreated && (
+            <p
+              className="mb-4 text-sm"
+              style={{ color: "var(--state-success)" }}
             >
-              Create your first guide
-            </Link>
-          </div>
-        )}
-
-        {session && myGuidesWithHandles.length > 0 && (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-              My guides
-            </h3>
-            <ul className="space-y-3">
-              {myGuidesWithHandles.map((g) => (
-                <li key={g.uri}>
-                  <Link href={g.href} className="block group">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
-                      {g.title}
-                    </span>
-                    <span className="text-zinc-500 dark:text-zinc-400 text-sm ml-2">
-                      @{g.handle}
-                    </span>
-                    <span className="text-zinc-400 dark:text-zinc-500 text-xs ml-2">
-                      {timeAgo(g.updatedAt)}
-                    </span>
-                    {g.description ? (
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5 line-clamp-1">
-                        {g.description}
-                      </p>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/guides/new"
-              className="mt-3 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Create a guide
-            </Link>
-          </div>
-        )}
-
-        <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-          <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-            Recent guides
-          </h3>
-          {recentGuidesWithHandles.length === 0 ? (
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-              No guides yet. Be the first to create one!
+              Account created. Sign in with your new handle below.
             </p>
-          ) : (
-            <ul className="space-y-3">
-              {recentGuidesWithHandles.map((g) => (
-                <li key={g.uri}>
-                  <Link href={g.href} className="block group">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
-                      {g.title}
-                    </span>
-                    <span className="text-zinc-500 dark:text-zinc-400 text-sm ml-2">
-                      @{g.handle}
-                    </span>
-                    <span className="text-zinc-400 dark:text-zinc-500 text-xs ml-2">
-                      {timeAgo(g.updatedAt)}
-                    </span>
-                    {g.description ? (
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-0.5 line-clamp-1">
-                        {g.description}
-                      </p>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           )}
-          <Link
-            href="/guides"
-            className="mt-3 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          <LoginForm defaultHandle={accountCreated} />
+          {createAccountAvailable && (
+            <p
+              className="mt-4 text-center text-sm"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              Don&apos;t have an account?{" "}
+              <Link href="/create-account" className="link-brand">
+                Create one
+              </Link>
+            </p>
+          )}
+        </div>
+      )}
+
+      {session && statusphereEnabled && (
+        <div className="feed-card p-6 mb-6">
+          <StatusPicker currentStatus={accountStatus?.status} />
+        </div>
+      )}
+
+      {session && myGuidesWithHandles.length === 0 && (
+        <div className="feed-card p-6 mb-6">
+          <h3
+            className="text-sm font-medium mb-2"
+            style={{ color: "var(--text-secondary)" }}
           >
-            All guides
+            My guides
+          </h3>
+          <p
+            className="text-sm mb-3"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            You haven&apos;t created any guides yet. Start your first guide to collect articles, events, and places.
+          </p>
+          <Link
+            href="/guides/new"
+            className="btn-primary text-sm px-3 py-1.5 inline-flex"
+          >
+            Create your first guide
           </Link>
         </div>
+      )}
 
-        {topStatuses.length > 0 && (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-              Top Statuses
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {topStatuses.map((s) => (
-                <span
-                  key={s.status}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-sm"
-                >
-                  <span className="text-lg">{s.status}</span>
-                  <span className="text-zinc-500 dark:text-zinc-400">
-                    {String(s.count)}
+      {session && myGuidesWithHandles.length > 0 && (
+        <div className="feed-card p-6 mb-6">
+          <h3
+            className="text-sm font-medium mb-4"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            My guides
+          </h3>
+          <ul className="space-y-3">
+            {myGuidesWithHandles.map((g) => (
+              <li key={g.uri}>
+                <Link href={g.href} className="block group">
+                  <span
+                    className="font-medium group-hover:underline"
+                    style={{ color: "var(--text-headline)" }}
+                  >
+                    {g.title}
                   </span>
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+                  <span
+                    className="text-sm ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    @{g.handle}
+                  </span>
+                  <span
+                    className="text-xs ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {timeAgo(g.updatedAt)}
+                  </span>
+                  {g.description ? (
+                    <p
+                      className="text-sm mt-0.5 line-clamp-1"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {g.description}
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link href="/guides/new" className="mt-3 inline-block text-sm link-brand">
+            Create a guide
+          </Link>
+        </div>
+      )}
 
-        <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
-          <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-3">
+      <div className="feed-card p-6 mb-6">
+        <h3
+          className="text-sm font-medium mb-4"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Recent guides
+        </h3>
+        {recentGuidesWithHandles.length === 0 ? (
+          <p
+            className="text-sm"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            No guides yet. Be the first to create one!
+          </p>
+        ) : (
+          <ul className="space-y-3">
+            {recentGuidesWithHandles.map((g) => (
+              <li key={g.uri}>
+                <Link href={g.href} className="block group">
+                  <span
+                    className="font-medium group-hover:underline"
+                    style={{ color: "var(--text-headline)" }}
+                  >
+                    {g.title}
+                  </span>
+                  <span
+                    className="text-sm ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    @{g.handle}
+                  </span>
+                  <span
+                    className="text-xs ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {timeAgo(g.updatedAt)}
+                  </span>
+                  {g.description ? (
+                    <p
+                      className="text-sm mt-0.5 line-clamp-1"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {g.description}
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Link href="/guides" className="mt-3 inline-block text-sm link-brand">
+          All guides
+        </Link>
+      </div>
+
+      {statusphereEnabled && topStatuses.length > 0 && (
+        <div className="feed-card p-6 mb-6">
+          <h3
+            className="text-sm font-medium mb-3"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Top Statuses
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {topStatuses.map((s) => (
+              <span
+                key={s.status}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm"
+                style={{
+                  background: "var(--bg-secondary)",
+                  color: "var(--text-headline)",
+                }}
+              >
+                <span className="text-lg">{s.status}</span>
+                <span style={{ color: "var(--text-secondary)" }}>
+                  {String(s.count)}
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {statusphereEnabled && (
+        <div className="feed-card p-6">
+          <h3
+            className="text-sm font-medium mb-3"
+            style={{ color: "var(--text-secondary)" }}
+          >
             Recent statuses
           </h3>
           {statuses.length === 0 ? (
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-secondary)" }}
+            >
               No statuses yet. Be the first!
             </p>
           ) : (
             <ul className="space-y-3">
               {statuses.map((s) => (
                 <li key={s.uri} className="flex items-center gap-3">
-                  <span className="text-2xl">{s.status}</span>
-                  <span className="text-zinc-600 dark:text-zinc-400 text-sm">
+                  <span
+                    className="text-2xl"
+                    style={{ color: "var(--text-headline)" }}
+                  >
+                    {s.status}
+                  </span>
+                  <span
+                    className="text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     @{s.handle}
                   </span>
-                  <span className="text-zinc-400 dark:text-zinc-500 text-xs ml-auto">
+                  <span
+                    className="text-xs ml-auto"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {timeAgo(s.createdAt)}
                   </span>
                 </li>
@@ -248,8 +300,8 @@ export default async function Home({ searchParams }: HomeProps) {
             </ul>
           )}
         </div>
-      </main>
-    </div>
+      )}
+    </>
   );
 }
 

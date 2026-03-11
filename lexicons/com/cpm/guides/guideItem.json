@@ -16,6 +16,9 @@
           "title": { "type": "string" },
           "description": { "type": "string" },
           "snapshotAt": { "type": "string", "format": "datetime" },
+          "latitude": { "type": "string", "description": "WGS84 latitude as decimal string for mapping" },
+          "longitude": { "type": "string", "description": "WGS84 longitude as decimal string for mapping" },
+          "neighborhoodId": { "type": "string", "description": "Community area or neighborhood identifier (e.g. Agate ID)" },
           "createdAt": { "type": "string", "format": "datetime" },
           "updatedAt": { "type": "string", "format": "datetime" }
         }

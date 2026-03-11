@@ -47,95 +47,139 @@ export default async function GuidesPage() {
   );
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <main className="w-full max-w-2xl mx-auto p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-            Guides
-          </h1>
+    <>
+      <div className="mb-8 flex items-center justify-between">
+        <h1
+          className="font-heading text-2xl font-bold"
+          style={{ color: "var(--text-headline)" }}
+        >
+          Guides
+        </h1>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/guides/map"
+            className="text-sm hover:underline"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            All on map
+          </Link>
           <Link
             href="/"
-            className="text-sm text-zinc-500 dark:text-zinc-400 hover:underline"
+            className="text-sm hover:underline"
+            style={{ color: "var(--text-secondary)" }}
           >
             Home
           </Link>
         </div>
+      </div>
 
-        {session && (
-          <div className="mb-8 flex items-center gap-3">
-            <Link
-              href="/guides/new"
-              className="inline-flex items-center justify-center rounded-md bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 text-sm font-medium"
-            >
-              Create a guide
-            </Link>
-          </div>
-        )}
-
-        {session && myWithHandles.length > 0 && (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-8">
-            <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4">
-              My guides
-            </h2>
-            <ul className="space-y-4">
-              {myWithHandles.map((g) => (
-                <li key={g.uri}>
-                  <Link href={g.href} className="block group">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
-                      {g.title}
-                    </span>
-                    <span className="text-zinc-500 dark:text-zinc-400 text-sm ml-2">
-                      @{g.handle}
-                    </span>
-                    <span className="text-zinc-400 dark:text-zinc-500 text-xs ml-2">
-                      {timeAgo(g.updatedAt)}
-                    </span>
-                    {g.description ? (
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1 line-clamp-2">
-                        {g.description}
-                      </p>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
-          <h2 className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-4">
-            Recent guides
-          </h2>
-          {recentWithHandles.length === 0 ? (
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-              No guides yet. Create one to get started.
-            </p>
-          ) : (
-            <ul className="space-y-4">
-              {recentWithHandles.map((g) => (
-                <li key={g.uri}>
-                  <Link href={g.href} className="block group">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline">
-                      {g.title}
-                    </span>
-                    <span className="text-zinc-500 dark:text-zinc-400 text-sm ml-2">
-                      @{g.handle}
-                    </span>
-                    <span className="text-zinc-400 dark:text-zinc-500 text-xs ml-2">
-                      {timeAgo(g.updatedAt)}
-                    </span>
-                    {g.description ? (
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-1 line-clamp-2">
-                        {g.description}
-                      </p>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+      {session && (
+        <div className="mb-8">
+          <Link
+            href="/guides/new"
+            className="btn-primary text-sm px-4 py-2 inline-flex"
+          >
+            Create a guide
+          </Link>
         </div>
-      </main>
-    </div>
+      )}
+
+      {session && myWithHandles.length > 0 && (
+        <div className="feed-card p-6 mb-8">
+          <h2
+            className="text-sm font-medium mb-4"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            My guides
+          </h2>
+          <ul className="space-y-4">
+            {myWithHandles.map((g) => (
+              <li key={g.uri}>
+                <Link href={g.href} className="block group">
+                  <span
+                    className="font-medium group-hover:underline"
+                    style={{ color: "var(--text-headline)" }}
+                  >
+                    {g.title}
+                  </span>
+                  <span
+                    className="text-sm ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    @{g.handle}
+                  </span>
+                  <span
+                    className="text-xs ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {timeAgo(g.updatedAt)}
+                  </span>
+                  {g.description ? (
+                    <p
+                      className="text-sm mt-1 line-clamp-2"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {g.description}
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="feed-card p-6">
+        <h2
+          className="text-sm font-medium mb-4"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Recent guides
+        </h2>
+        {recentWithHandles.length === 0 ? (
+          <p
+            className="text-sm"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            No guides yet. Create one to get started.
+          </p>
+        ) : (
+          <ul className="space-y-4">
+            {recentWithHandles.map((g) => (
+              <li key={g.uri}>
+                <Link href={g.href} className="block group">
+                  <span
+                    className="font-medium group-hover:underline"
+                    style={{ color: "var(--text-headline)" }}
+                  >
+                    {g.title}
+                  </span>
+                  <span
+                    className="text-sm ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    @{g.handle}
+                  </span>
+                  <span
+                    className="text-xs ml-2"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {timeAgo(g.updatedAt)}
+                  </span>
+                  {g.description ? (
+                    <p
+                      className="text-sm mt-1 line-clamp-2"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {g.description}
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </>
   );
 }

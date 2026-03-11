@@ -9,7 +9,9 @@
     "start": "pnpm migrate && next start -p ${PORT:-3000} -H 0.0.0.0",
     "lint": "eslint",
     "migrate": "tsx scripts/migrate.ts",
-    "gen-key": "tsx scripts/gen-key.ts"
+    "gen-key": "tsx scripts/gen-key.ts",
+    "seed-guides": "tsx scripts/seed-guides.ts",
+    "railway-seed": "tsx scripts/railway-seed.ts"
   },
   "dependencies": {
     "@atproto/common-web": "^0.4.18",
@@ -24,9 +26,12 @@
     "kysely": "^0.28.11",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-leaflet": "^5.0.0",
+    "leaflet": "^1.9.4"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.8",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",

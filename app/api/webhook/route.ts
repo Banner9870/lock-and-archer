@@ -12,6 +12,7 @@ import {
   deleteGuideItem,
   deleteItemsByGuideUri,
 } from "@/lib/db/queries";
+import { isStatusphereEnabled } from "@/lib/config";
 import * as xyz from "@/src/lexicons/xyz";
 import * as com from "@/src/lexicons/com";
 
@@ -54,20 +55,24 @@ export async function POST(request: NextRequest) {
       }
 
       if (evt.collection === "xyz.statusphere.status") {
-        let record: xyz.statusphere.status.Main;
-        try {
-          record = xyz.statusphere.status.$parse(evt.record);
-        } catch {
-          return NextResponse.json({ success: false });
+        if (!isStatusphereEnabled()) {
+          // Skip indexing; return success so Tap doesn't retry
+        } else {
+          let record: xyz.statusphere.status.Main;
+          try {
+            record = xyz.statusphere.status.$parse(evt.record);
+          } catch {
+            return NextResponse.json({ success: false });
+          }
+          await insertStatus({
+            uri: uri.toString(),
+            authorDid: evt.did,
+            status: record.status,
+            createdAt: record.createdAt,
+            indexedAt: new Date().toISOString(),
+            current: 1,
+          });
         }
-        await insertStatus({
-          uri: uri.toString(),
-          authorDid: evt.did,
-          status: record.status,
-          createdAt: record.createdAt,
-          indexedAt: new Date().toISOString(),
-          current: 1,
-        });
       } else if (evt.collection === "com.cpm.guides.guide") {
         let record: com.cpm.guides.guide.Main;
         try {
@@ -105,10 +110,19 @@ export async function POST(request: NextRequest) {
           description: record.description ?? "",
           snapshotAt: record.snapshotAt ?? "",
           indexedAt: new Date().toISOString(),
+          latitude:
+            record.latitude != null && record.latitude !== ""
+              ? parseFloat(record.latitude)
+              : null,
+          longitude:
+            record.longitude != null && record.longitude !== ""
+              ? parseFloat(record.longitude)
+              : null,
+          neighborhoodId: record.neighborhoodId ?? null,
         });
       }
     } else if (evt.action === "delete") {
-      if (evt.collection === "xyz.statusphere.status") {
+      if (evt.collection === "xyz.statusphere.status" && isStatusphereEnabled()) {
         await deleteStatus(uri);
       } else if (evt.collection === "com.cpm.guides.guide") {
         await deleteItemsByGuideUri(uri.toString());

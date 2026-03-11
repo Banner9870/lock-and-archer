@@ -45,7 +45,10 @@ export function LoginForm({ defaultHandle }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+        <label
+          className="block text-sm font-medium mb-1"
+          style={{ color: "var(--text-headline)" }}
+        >
           Handle
         </label>
         <input
@@ -53,20 +56,32 @@ export function LoginForm({ defaultHandle }: LoginFormProps) {
           value={handle}
           onChange={(e) => setHandle(e.target.value)}
           placeholder="alice.your-pds.up.railway.app"
-          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+          className="w-full px-3 py-2 rounded-lg disabled:opacity-50"
+          style={{
+            border: "1px solid var(--border-color)",
+            background: "var(--surface)",
+            color: "var(--text-headline)",
+          }}
           disabled={loading}
         />
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p
+          className="mt-1 text-xs"
+          style={{ color: "var(--text-secondary)" }}
+        >
           Use your full handle; for a test PDS it must match the PDS hostname (e.g. alice.lock-and-archer-pds-production.up.railway.app).
         </p>
       </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <p className="text-sm" style={{ color: "var(--state-danger)" }}>
+          {error}
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={loading || !handle}
-        className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        className="btn-primary w-full py-2 px-4 disabled:opacity-50"
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>

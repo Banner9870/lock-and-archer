@@ -1,6 +1,6 @@
 # Design Standards – Lock and Archer
 
-These standards apply to Lock & Archer’s UI work. They should inform **all new guide, data-source, and feed UIs** described in the roadmap.
+**Reference.** These standards apply to Lock & Archer’s UI work. They should inform **all new guide, data-source, and feed UIs** described in the roadmap. Implementation is partial (e.g. tokens and variables in use; full token JSON and typography may not be applied everywhere).
 
 > **Critical rule:** Never hardcode hex values in components. Always use CSS variables (or your stack’s design tokens).
 

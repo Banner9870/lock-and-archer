@@ -1,0 +1,398 @@
+[
+  {
+    "title": "Weekend in Pilsen",
+    "description": "Art walks, tacos, and music in Pilsen.",
+    "slug": "weekend-in-pilsen",
+    "items": [
+      {
+        "type": "article",
+        "title": "Murals you shouldn't miss",
+        "description": "A walk through 18th Street's mural corridor.",
+        "sourceId": "dummy-article-1",
+        "sourceUrl": "https://example.com/pilsen-murals",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.856,
+        "longitude": -87.656,
+        "neighborhoodId": "Pilsen"
+      },
+      {
+        "type": "event",
+        "title": "Friday night gallery crawl",
+        "description": "Open studios and galleries along Halsted.",
+        "sourceId": "dummy-event-1",
+        "sourceUrl": "https://example.com/gallery-crawl",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.858,
+        "longitude": -87.654,
+        "neighborhoodId": "Pilsen"
+      },
+      {
+        "type": "business",
+        "title": "Cafe de la Noche",
+        "description": "Late-night café with live jazz.",
+        "sourceId": "dummy-business-1",
+        "sourceUrl": "https://example.com/cafe-de-la-noche",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.857,
+        "longitude": -87.655,
+        "neighborhoodId": "Pilsen"
+      }
+    ]
+  },
+  {
+    "title": "Transit updates and tips",
+    "description": "CTA and Metra news and how to get around.",
+    "slug": "transit-updates",
+    "items": [
+      {
+        "type": "article",
+        "title": "Red Line extension timeline",
+        "description": "Latest on the 130th Street extension.",
+        "sourceId": "dummy-article-2",
+        "sourceUrl": "https://example.com/red-line-extension",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.654,
+        "longitude": -87.602,
+        "neighborhoodId": "Riverdale"
+      },
+      {
+        "type": "article",
+        "title": "Ventra app tips",
+        "description": "Save time with these Ventra tricks.",
+        "sourceId": "dummy-article-3",
+        "sourceUrl": "https://example.com/ventra-tips",
+        "sourceLabel": "WBEZ"
+      }
+    ]
+  },
+  {
+    "title": "South Loop eats and events",
+    "description": "Restaurants and happenings in the South Loop.",
+    "slug": "south-loop-eats",
+    "items": [
+      {
+        "type": "business",
+        "title": "Printers Row Books",
+        "description": "Independent bookstore and café.",
+        "sourceId": "dummy-business-2",
+        "sourceUrl": "https://example.com/printers-row-books",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.872,
+        "longitude": -87.627,
+        "neighborhoodId": "Near South Side"
+      },
+      {
+        "type": "event",
+        "title": "Printers Row Lit Fest",
+        "description": "Annual book fair and author talks.",
+        "sourceId": "dummy-event-2",
+        "sourceUrl": "https://example.com/printers-row-lit-fest",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.873,
+        "longitude": -87.626,
+        "neighborhoodId": "Near South Side"
+      }
+    ]
+  },
+  {
+    "title": "Bears and Chicago sports",
+    "description": "Bears, Sox, Cubs, and Chicago sports coverage.",
+    "slug": "chicago-sports",
+    "items": [
+      {
+        "type": "article",
+        "title": "Bears 2025 draft board: Top needs and fits",
+        "description": "Breaking down positions and prospects as the draft approaches.",
+        "sourceId": "suntimes-bears-draft",
+        "sourceUrl": "https://chicago.suntimes.com/sports/bears/2025/04/bears-draft-board-needs",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "article",
+        "title": "White Sox rebuild: What the front office is saying",
+        "description": "Latest from the front office on the rebuild timeline.",
+        "sourceId": "suntimes-sox-rebuild",
+        "sourceUrl": "https://chicago.suntimes.com/sports/white-sox/2025/03/sox-rebuild-front-office",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.8299,
+        "longitude": -87.6338,
+        "neighborhoodId": "Armour Square"
+      },
+      {
+        "type": "event",
+        "title": "Cubs Opening Day watch party",
+        "description": "Watch the home opener with fellow fans at Gallagher Way.",
+        "sourceId": "event-cubs-opener",
+        "sourceUrl": "https://www.mlb.com/cubs/tickets/opening-day",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.9484,
+        "longitude": -87.6553,
+        "neighborhoodId": "Lake View"
+      }
+    ]
+  },
+  {
+    "title": "City Hall and local politics",
+    "description": "City Council, mayor, and Cook County news.",
+    "slug": "city-hall-politics",
+    "items": [
+      {
+        "type": "article",
+        "title": "City Council passes affordable housing ordinance",
+        "description": "New requirements for developers and set-asides for low-income units.",
+        "sourceId": "suntimes-housing-ordinance",
+        "sourceUrl": "https://chicago.suntimes.com/city-hall/2025/03/city-council-affordable-housing-ordinance",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "article",
+        "title": "Johnson administration responds to CTA safety concerns",
+        "description": "Mayor's office outlines new transit safety initiatives.",
+        "sourceId": "suntimes-cta-safety",
+        "sourceUrl": "https://chicago.suntimes.com/city-hall/2025/03/johnson-cta-safety-response",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "event",
+        "title": "Town hall: Public safety and policing",
+        "description": "District council meeting on police accountability and community safety.",
+        "sourceId": "event-town-hall-safety",
+        "sourceUrl": "https://www.chicago.gov/townhall",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "neighborhoodId": "Loop"
+      }
+    ]
+  },
+  {
+    "title": "Food and dining in Chicago",
+    "description": "Restaurant reviews, openings, and food news.",
+    "slug": "chicago-food-dining",
+    "items": [
+      {
+        "type": "article",
+        "title": "Best new restaurants in Chicago spring 2025",
+        "description": "Our critics' picks for the hottest new spots.",
+        "sourceId": "suntimes-best-new-restaurants",
+        "sourceUrl": "https://chicago.suntimes.com/food-and-dining/2025/03/best-new-restaurants-chicago-spring-2025",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "article",
+        "title": "Taste of Chicago 2025: Dates, lineup, and what to try",
+        "description": "Full guide to the city's biggest food festival.",
+        "sourceId": "suntimes-taste-of-chicago",
+        "sourceUrl": "https://chicago.suntimes.com/food-and-dining/2025/03/taste-of-chicago-2025-dates-lineup",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.8826,
+        "longitude": -87.6226,
+        "neighborhoodId": "Loop"
+      },
+      {
+        "type": "business",
+        "title": "Avec",
+        "description": "Mediterranean-inspired shared plates in the West Loop.",
+        "sourceId": "business-avec",
+        "sourceUrl": "https://www.avecrestaurant.com",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.8825,
+        "longitude": -87.647,
+        "neighborhoodId": "Near West Side"
+      },
+      {
+        "type": "event",
+        "title": "Chicago Restaurant Week",
+        "description": "Two weeks of prix-fixe menus at hundreds of restaurants.",
+        "sourceId": "event-restaurant-week",
+        "sourceUrl": "https://www.choosechicago.com/restaurant-week",
+        "sourceLabel": "WBEZ"
+      }
+    ]
+  },
+  {
+    "title": "Neighborhood spotlights",
+    "description": "Deep dives into Chicago neighborhoods and culture.",
+    "slug": "neighborhood-spotlights",
+    "items": [
+      {
+        "type": "article",
+        "title": "Rogers Park: A neighborhood guide to the far north side",
+        "description": "Beaches, diversity, and local businesses along the Red Line.",
+        "sourceId": "suntimes-rogers-park",
+        "sourceUrl": "https://chicago.suntimes.com/neighborhoods/2025/03/rogers-park-neighborhood-guide",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.994,
+        "longitude": -87.669,
+        "neighborhoodId": "Rogers Park"
+      },
+      {
+        "type": "article",
+        "title": "Back of the Yards is changing. Here's what's staying.",
+        "description": "Longtime residents and new development in a historic neighborhood.",
+        "sourceId": "suntimes-back-of-the-yards",
+        "sourceUrl": "https://chicago.suntimes.com/neighborhoods/2025/03/back-of-the-yards-changing",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.808,
+        "longitude": -87.668,
+        "neighborhoodId": "New City"
+      },
+      {
+        "type": "event",
+        "title": "Logan Square farmers market opening day",
+        "description": "Season kickoff with local vendors and live music.",
+        "sourceId": "event-logan-farmers",
+        "sourceUrl": "https://www.logansquarefarmersmarket.org",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.923,
+        "longitude": -87.709,
+        "neighborhoodId": "Logan Square"
+      }
+    ]
+  },
+  {
+    "title": "Crime and public safety",
+    "description": "Reporting on crime, courts, and community safety.",
+    "slug": "crime-public-safety",
+    "items": [
+      {
+        "type": "article",
+        "title": "CPD consent decree: Latest report shows progress on reforms",
+        "description": "Federal monitor's update on police department compliance.",
+        "sourceId": "suntimes-consent-decree",
+        "sourceUrl": "https://chicago.suntimes.com/crime/2025/03/cpd-consent-decree-latest-report",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "article",
+        "title": "Cook County State's Attorney race: Where the candidates stand",
+        "description": "Key issues and endorsements in the 2025 race.",
+        "sourceId": "suntimes-states-attorney-race",
+        "sourceUrl": "https://chicago.suntimes.com/politics/2025/03/cook-county-states-attorney-race-candidates",
+        "sourceLabel": "Sun-Times"
+      }
+    ]
+  },
+  {
+    "title": "Arts and culture",
+    "description": "Theater, museums, music, and visual arts in Chicago.",
+    "slug": "arts-culture",
+    "items": [
+      {
+        "type": "article",
+        "title": "Steppenwolf's 2025 season: What to see",
+        "description": "New plays and revivals at the landmark theater.",
+        "sourceId": "suntimes-steppenwolf-2025",
+        "sourceUrl": "https://chicago.suntimes.com/arts-culture/2025/03/steppenwolf-2025-season-preview",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.9144,
+        "longitude": -87.6775,
+        "neighborhoodId": "Lincoln Park"
+      },
+      {
+        "type": "event",
+        "title": "Millennium Park summer concert series",
+        "description": "Free outdoor concerts at the Pritzker Pavilion.",
+        "sourceId": "event-millennium-park-concerts",
+        "sourceUrl": "https://www.chicago.gov/millenniumpark",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.8826,
+        "longitude": -87.6226,
+        "neighborhoodId": "Loop"
+      },
+      {
+        "type": "event",
+        "title": "Art Institute free Thursday evenings",
+        "description": "Free admission for Illinois residents every Thursday evening.",
+        "sourceId": "event-art-institute-free",
+        "sourceUrl": "https://www.artic.edu/visit",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.8796,
+        "longitude": -87.6237,
+        "neighborhoodId": "Loop"
+      },
+      {
+        "type": "business",
+        "title": "Thalia Hall",
+        "description": "Concert venue and restaurant in Pilsen.",
+        "sourceId": "business-thalia-hall",
+        "sourceUrl": "https://www.thaliahallchicago.com",
+        "sourceLabel": "chicago.com",
+        "latitude": 41.858,
+        "longitude": -87.656,
+        "neighborhoodId": "Pilsen"
+      }
+    ]
+  },
+  {
+    "title": "Education and schools",
+    "description": "CPS, colleges, and education policy.",
+    "slug": "education-schools",
+    "items": [
+      {
+        "type": "article",
+        "title": "CPS budget 2025: What's in and what's cut",
+        "description": "Breakdown of the district's proposed budget and school-level impacts.",
+        "sourceId": "suntimes-cps-budget",
+        "sourceUrl": "https://chicago.suntimes.com/education/2025/03/cps-budget-2025-whats-in-whats-cut",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "article",
+        "title": "Chicago teachers union contract: Key wins and next steps",
+        "description": "Summary of the new CTU agreement and implementation.",
+        "sourceId": "suntimes-ctu-contract",
+        "sourceUrl": "https://chicago.suntimes.com/education/2025/03/ctu-contract-key-wins",
+        "sourceLabel": "Sun-Times"
+      },
+      {
+        "type": "event",
+        "title": "CPS high school fair",
+        "description": "Meet schools and learn about options for next year.",
+        "sourceId": "event-cps-high-school-fair",
+        "sourceUrl": "https://www.cps.edu/school-fair",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.8781,
+        "longitude": -87.6298,
+        "neighborhoodId": "Loop"
+      }
+    ]
+  },
+  {
+    "title": "Weather and outdoors",
+    "description": "Lakefront, parks, and seasonal happenings.",
+    "slug": "weather-outdoors",
+    "items": [
+      {
+        "type": "article",
+        "title": "Chicago lakefront trail: Best sections for running and biking",
+        "description": "Mile-by-mile guide to the 18-mile path.",
+        "sourceId": "suntimes-lakefront-trail",
+        "sourceUrl": "https://chicago.suntimes.com/outdoors/2025/03/lakefront-trail-best-sections-running-biking",
+        "sourceLabel": "Sun-Times",
+        "latitude": 41.8819,
+        "longitude": -87.6278,
+        "neighborhoodId": "Loop"
+      },
+      {
+        "type": "event",
+        "title": "Chicago Park District summer program registration",
+        "description": "Sign up for camps, sports, and classes.",
+        "sourceId": "event-park-district-summer",
+        "sourceUrl": "https://www.chicagoparkdistrict.com",
+        "sourceLabel": "chicago.com"
+      },
+      {
+        "type": "business",
+        "title": "Bike the Drive",
+        "description": "Annual car-free Lake Shore Drive ride.",
+        "sourceId": "business-bike-the-drive",
+        "sourceUrl": "https://www.bikethedrive.org",
+        "sourceLabel": "WBEZ",
+        "latitude": 41.8819,
+        "longitude": -87.6231,
+        "neighborhoodId": "Loop"
+      }
+    ]
+  }
+]

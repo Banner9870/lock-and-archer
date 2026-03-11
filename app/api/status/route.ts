@@ -2,10 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { Client, l } from "@atproto/lex";
 import { getSession } from "@/lib/auth/session";
 import { getOAuthClient } from "@/lib/auth/client";
+import { isStatusphereEnabled } from "@/lib/config";
 import * as xyz from "@/src/lexicons/xyz";
 import { insertStatus, upsertAccount, getAccountHandle } from "@/lib/db/queries";
 
 export async function POST(request: NextRequest) {
+  if (!isStatusphereEnabled()) {
+    return NextResponse.json(
+      { error: "Statusphere is disabled" },
+      { status: 404 }
+    );
+  }
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

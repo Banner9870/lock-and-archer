@@ -107,6 +107,55 @@ const migrations: Record<string, Migration> = {
       await db.schema.dropTable("guide").execute();
     },
   },
+  "004": {
+    async up(db: Kysely<unknown>) {
+      await db.schema
+        .alterTable("guide_item")
+        .addColumn("latitude", "real", (col) => col)
+        .execute();
+      await db.schema
+        .alterTable("guide_item")
+        .addColumn("longitude", "real", (col) => col)
+        .execute();
+      await db.schema
+        .alterTable("guide_item")
+        .addColumn("neighborhoodId", "text", (col) => col)
+        .execute();
+    },
+    async down(db: Kysely<unknown>) {
+      await db.schema.alterTable("guide_item").dropColumn("latitude").execute();
+      await db.schema.alterTable("guide_item").dropColumn("longitude").execute();
+      await db.schema.alterTable("guide_item").dropColumn("neighborhoodId").execute();
+    },
+  },
+  "005": {
+    async up(db: Kysely<unknown>) {
+      await db.schema
+        .createTable("feed_article")
+        .addColumn("url", "text", (col) => col.primaryKey())
+        .addColumn("sourceId", "text", (col) => col.notNull())
+        .addColumn("sourceLabel", "text", (col) => col.notNull())
+        .addColumn("title", "text", (col) => col.notNull())
+        .addColumn("description", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("publishedAt", "text", (col) => col.notNull())
+        .addColumn("fetchedAt", "text", (col) => col.notNull())
+        .addColumn("neighborhoodId", "text", (col) => col)
+        .execute();
+      await db.schema
+        .createIndex("feed_article_published_at_idx")
+        .on("feed_article")
+        .column("publishedAt")
+        .execute();
+      await db.schema
+        .createIndex("feed_article_source_id_idx")
+        .on("feed_article")
+        .column("sourceId")
+        .execute();
+    },
+    async down(db: Kysely<unknown>) {
+      await db.schema.dropTable("feed_article").execute();
+    },
+  },
 };
 
 export function getMigrator() {

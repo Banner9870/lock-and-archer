@@ -2,24 +2,28 @@
 
 ---
 
-## Phase 4 – Feeds (community areas and citywide)
+## Phase 4 – Feeds (implemented)
 
-Once guides and Agate (Phase 3) are in place, we build **feeds** that answer “what’s relevant where.”
+Feeds answer “what’s relevant where” and “what’s from people I follow.”
 
-- **Per community area** – For each Chicago community area, show guides that contain items in that area (using `neighborhoodId` on items). Route e.g. `/community/[communityAreaSlug]`.
-- **Citywide** – New or updated guides across all areas; optionally highlight staff guides (Chicago Sun-Times, WBEZ, chicago.com) and remix activity.
-- **Custom feeds (ATProto)** – A feed service can subscribe to the firehose, maintain a view, and expose feeds that other ATProto clients can subscribe to. Technical users can fork this service and add their own logic (e.g. “guides containing Agate places with category X”).
+### Implemented
 
-**Implementation** – In-app feeds are API endpoints (e.g. `GET /api/feeds/citywide`, `GET /api/feeds/community/[communityAreaId]`) that query the `guide` and `guide_item` tables, filter by neighborhoodId when needed, and sort by recency or other signals. See [technical-appendix.md](technical-appendix.md).
+- **Citywide** – `GET /api/feeds/citywide`; page `/feeds/citywide`. Unified feed of guides and articles (e.g. Chicago Sun-Times RSS), newest first.
+- **Community area** – `GET /api/feeds/community/[communityId]`; page `/feeds/community/[id]`. Guides (and tagged articles) for that neighborhood; same unified shape as citywide.
+- **Following** – `GET /api/feeds/following` (auth required); page `/feeds/following`. Guides from accounts the signed-in user follows. Uses PDS `app.bsky.graph.getFollows` and app DB `listGuidesByAuthorDids`.
+- **Feeds landing** – `/feeds` with links to Citywide, Following, and community areas (from `COMMUNITY_AREAS`).
+- **Chicago Sun-Times RSS** – Articles from [chicago.suntimes.com/rss](https://chicago.suntimes.com/rss/index.xml) ingested via `GET` or `POST /api/ingest/suntimes-rss`; stored in `feed_article`; merged into citywide and community feeds.
+
+Implementation: `lib/feeds/unified.ts` (`getUnifiedFeedItems`, `getFollowingFeedItems`, `getFollowedDids`, `getFollowingFeedForUser`); `lib/db/queries.ts` (`listGuidesByAuthorDids`). See [technical-appendix.md](technical-appendix.md).
 
 ---
 
-## Phase 5 – Making feeds pluggable
+## Phase 5 – Pluggable feeds (future)
 
-Phase 5 makes feeds **first-class and pluggable**:
+Phase 5 would make feeds **pluggable**:
 
-- Documented **feed definition pattern** (e.g. “write a function with this signature”).
-- A `feeds/` directory or repo with community-area feed, citywide feed, staff-only feed (Sun-Times / WBEZ / chicago.com), and room for community-contributed feeds.
-- The main app discovers which feeds exist and surfaces them; technical users can add or modify feeds with minimal friction.
+- Documented feed definition pattern (e.g. function signature).
+- A `feeds/` directory or repo with community-area, citywide, staff-only, and community-contributed feeds.
+- App discovers which feeds exist and surfaces them.
 
-This keeps a clear split between core product feeds and experimental or user-authored feed logic.
+Not yet implemented.

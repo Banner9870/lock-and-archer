@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lock & Archer
 
-## Getting Started
+An AT Protocol (ATProto) app for **community guides** and **local storytelling**: create and share guides (articles, events, places), follow other guide authors, and browse unified feeds (citywide, by community area, or from people you follow).
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router)
+- **ATProto** – OAuth sign-in, guides and guide items stored in the user’s PDS; app DB (SQLite) for indexing and feeds
+- **Kysely** + **better-sqlite3** for the app database
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+pnpm migrate
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Set `PDS_APP_URL` in `.env.local` (and optionally `PUBLIC_URL`, `PRIVATE_KEY`, `DATABASE_PATH`) for full OAuth and guide features.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Run migrations and start Next.js dev server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Run migrations and start production server |
+| `pnpm migrate` | Run DB migrations |
+| `pnpm seed-guides` | Seed guides for one account (requires OAuth session; set `SEED_HANDLE` or `SEED_DID`) |
+| `pnpm railway-seed` | Reseed alice/bob/carol on PDS (profiles, avatars, follows, guides); use on deploy when `PDS_APP_URL` is set |
+| `pnpm gen-key` | Generate OAuth client private key for `PRIVATE_KEY` |
 
-## Learn More
+## Docs
 
-To learn more about Next.js, take a look at the following resources:
+- **[docs/README.md](docs/README.md)** – Doc index and roadmap
+- **[RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md)** – Deploying to Railway (env, volume, deploy-time seed, blob proxy)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Features (current)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Auth** – OAuth sign-in; create account on your PDS when `PDS_APP_URL` is set
+- **Guides** – Create guides, add items (from Agate or Chicago Public Library events), view on map
+- **Feeds** – Citywide (guides + Sun-Times RSS), by community area, **Following** (guides from people you follow; requires sign-in)
+- **Blob proxy** – Safe avatar/media URLs via `GET /api/blob?did=...&cid=...`
+- **Deploy seed** – `pnpm railway-seed` to reseed three test accounts with profiles, avatars, mutual follows, and guides

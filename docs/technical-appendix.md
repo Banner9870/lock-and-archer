@@ -1,65 +1,66 @@
 # Technical appendix
 
-Reference for engineers: ATProto components we use, DB shapes, write/read paths, and later-phase notes.
+Reference for engineers: ATProto components, DB shapes, write/read paths, and feed implementation.
 
 ---
 
 ## A. ATProto components
 
-- **PDS** – User accounts and records. Must accept our custom guide lexicons; see [phase-2-implementation.md](phase-2-implementation.md) for confirming PDS config.
-- **Lexicons** – `xyz.statusphere.status` (existing); `com.cpm.guides.guide`, `com.cpm.guides.guideItem` (Phase 2). TypeScript under `src/lexicons/…`. Phase 2 UI shows property badges (Chicago Sun-Times, WBEZ, chicago.com) per staff DID config.
-- **Tap** – Subscribes to identity, status, and (after Phase 2) guide/guideItem; forwards to `/api/webhook`.
-- **App DB (SQLite + Kysely)** – Existing: `auth_state`, `auth_session`, `account`, `status`. Phase 2: `guide`, `guide_item`.
+- **PDS** – User accounts and records. Must accept custom guide lexicons; see [phase-2-implementation.md](phase-2-implementation.md).
+- **Lexicons** – `com.cpm.guides.guide`, `com.cpm.guides.guideItem`. TypeScript under `src/lexicons/…`. Optional: `xyz.statusphere.status` when Statusphere is enabled.
+- **Tap** – Subscribes to identity, status, and guide/guideItem; forwards to `/api/webhook`.
+- **App DB (SQLite + Kysely)** – `auth_state`, `auth_session`, `account`, `status` (optional), `guide`, `guide_item`, `feed_article`.
 
 ---
 
-## B. Guide table shapes (conceptual)
+## B. Guide table shapes
 
-**Guide**
+**Guide** – uri (PK), authorDid, title, description, slug, forkedFrom, createdAt, updatedAt, indexedAt.
 
-- uri (PK), authorDid, title, description, slug, forkedFrom, createdAt, updatedAt, indexedAt.
+**GuideItem** – uri (PK), guideUri, authorDid, type, sourceId, sourceUrl, sourceLabel, title, description, snapshotAt, indexedAt, latitude, longitude, neighborhoodId (all nullable for geo).
 
-**GuideItem**
-
-- uri (PK), guideUri, authorDid, type, sourceId, sourceUrl, sourceLabel, title, description, snapshotAt, indexedAt.
-- Phase 3+: latitude, longitude, neighborhoodId (nullable).
-
-All timestamp columns stored as strings (ISO) in SQLite.
+Timestamps stored as ISO strings in SQLite.
 
 ---
 
 ## C. Write path vs read path
 
-- **Write** – API validates input and session → OAuth client create/put/delete to PDS → write-through to DB (insert/update/delete guide or guide_item) → return JSON.
-- **Read** – Primarily from DB: list guides, get guide by URI/slug, list items by guideUri. Fall back to PDS only when needed (e.g. DB missing a record).
+- **Write** – API validates input and session → OAuth client create/put to PDS → write-through to DB (insert/update guide or guide_item) → return JSON.
+- **Read** – Primarily from DB: list guides, get guide by URI/slug, list items by guideUri, listGuidesByAuthorDids (for Following feed). Fall back to PDS only when needed.
 
 ---
 
 ## D. Data-source adapters (Phase 3)
 
-Each source implements something like:
+Each source implements:
 
-- `resolveById(sourceId) → { title, description, geo?, neighborhoodId? }`
+- `resolveById(sourceId)` → `{ title, description, geo?, neighborhoodId? }`
+- Optional: `search(q)` for search UI.
 
-For Agate: `resolvePlaceOrArea(sourceId)` calls Agate API and maps to our snapshot shape. Used by “Add from source” and “Refresh from source.”
+Agate and Chicago Socrata (CPL events) adapters are in `lib/data-sources/`. Used by “Add from Agate” and “Add from Chicago Public Library” and by the feed/neighborhoodId logic.
 
 ---
 
 ## E. Feeds (Phase 4)
 
-- **In-app** – Endpoints such as `GET /api/feeds/citywide`, `GET /api/feeds/community/[communityAreaId]` query `guide` and `guide_item`, filter by neighborhoodId when needed, aggregate and sort.
-- **Custom feed service** – Separate service subscribes to Tap, maintains its own index, exposes ATProto feed endpoints; can be extended by technical users.
+- **Citywide** – `getUnifiedFeedItems(limit, null)`: recent guides + feed articles (e.g. Sun-Times), sorted by date. `GET /api/feeds/citywide`.
+- **Community area** – `getUnifiedFeedItems(limit, communityId)`: guides with items in that neighborhood + articles tagged to that area. `GET /api/feeds/community/[communityId]`.
+- **Following** – `getFollowedDids(actorDid)` calls PDS `app.bsky.graph.getFollows`; `getFollowingFeedItems(limit, followedDids)` uses `listGuidesByAuthorDids`. `GET /api/feeds/following` (auth required).
+
+Implementation: `lib/feeds/unified.ts`; `lib/db/queries.ts` (`listRecentGuides`, `listGuidesByNeighborhoodId`, `listGuidesByAuthorDids`, `listRecentFeedArticles`, `listFeedArticlesByNeighborhoodId`).
 
 ---
 
 ## F. Phase 6 – Community-area onboarding (later)
 
-- **Storage** – Extend `account` or add `user_preferences` (e.g. did, communityAreaId, updatedAt). Key by DID.
-- **Boundaries** – [City of Chicago – Boundaries: Community Areas](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6). Point-in-polygon (lat, lon) → community area ID/name. Align with Agate’s neighborhoodId.
-- **Geocoding** – Address → coordinates, then boundary lookup. Optional step; store only community area for privacy.
+- **Storage** – Extend `account` or add `user_preferences` (e.g. did, communityAreaId). Key by DID.
+- **Boundaries** – City of Chicago community area boundaries; point-in-polygon (lat, lon) → community area. Align with Agate’s neighborhoodId.
+- **Geocoding** – Address → coordinates → boundary lookup. Optional; store only community area for privacy.
+
+Not implemented.
 
 ---
 
 ## Design standards
 
-UI must follow [design-standards.md](design-standards.md): tokens, no hardcoded hex, typography, mobile-first, accessibility.
+UI should follow [design-standards.md](design-standards.md): tokens, typography, mobile-first, accessibility.

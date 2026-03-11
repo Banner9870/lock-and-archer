@@ -1,7 +1,7 @@
 # Phase 1 Research: Guide Data Model & Architecture
 
-**Status:** Draft  
-**Last updated:** 2026-03-10  
+**Status:** Research complete; Phase 2 is implemented (see [PHASE-1-2-REVIEW.md](PHASE-1-2-REVIEW.md)).  
+**Last updated:** 2026-03-11  
 **Context:** Built to Share — local guides co-creation (CPM + users). Guides contain a mix of articles, events, businesses; data from external APIs with hybrid reference + snapshot storage.
 
 ---
@@ -130,10 +130,4 @@ All items share:
 
 ## 9. Phase 2 readiness
 
-Once we have:
-
-1. Confirmation of NSID and Option A vs B for items,  
-2. Data source details (and example shapes) for articles, events, businesses,  
-3. Confirmation that the PDS(es) in use can store these lexicons,
-
-we can move to **Phase 2:** implement the lexicons, migrations, CRUD API, Tap webhook, and basic UI (create guide, add mixed items, fork, share).
+Phase 2 is implemented: lexicons, migrations, CRUD API (create guide, add item), Tap webhook, and UI (create guide, list recent/my guides, view detail, Add from Agate / Add from Chicago Public Library). Fork, PATCH/DELETE guide, and property badge UI are deferred. See [phase-2-implementation.md](phase-2-implementation.md) and [PHASE-1-2-REVIEW.md](PHASE-1-2-REVIEW.md).

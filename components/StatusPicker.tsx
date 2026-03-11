@@ -69,11 +69,16 @@ export function StatusPicker({ currentStatus }: StatusPickerProps) {
 
   return (
     <div>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
+      <p
+        className="text-sm mb-3"
+        style={{ color: "var(--text-secondary)" }}
+      >
         Set your status
       </p>
       {error && (
-        <p className="text-red-500 dark:text-red-400 text-sm mb-3">{error}</p>
+        <p className="text-sm mb-3" style={{ color: "var(--state-danger)" }}>
+          {error}
+        </p>
       )}
       <div className="flex flex-wrap gap-2">
         {EMOJIS.map((emoji) => (
@@ -81,13 +86,16 @@ export function StatusPicker({ currentStatus }: StatusPickerProps) {
             key={emoji}
             onClick={() => handleSelect(emoji)}
             disabled={loading}
-            className={`text-2xl p-2 rounded-lg transition-all
-              ${
-                selected === emoji
-                  ? "bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              }
-              disabled:opacity-50 disabled:cursor-not-allowed`}
+            className="text-2xl p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
+            style={
+              selected === emoji
+                ? {
+                    background: "color-mix(in srgb, var(--brand-red) 20%, transparent)",
+                    outline: "2px solid var(--brand-red)",
+                    outlineOffset: "2px",
+                  }
+                : { background: "transparent" }
+            }
           >
             {emoji}
           </button>

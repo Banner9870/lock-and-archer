@@ -44,3 +44,6 @@ app.db-wal
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# avoid committing nested duplicate if present
+/lock-and-archer/

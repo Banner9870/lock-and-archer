@@ -1,6 +1,7 @@
 import type { Transaction } from "kysely";
+import { sql } from "kysely";
 import { getTap } from "@/lib/tap";
-import type { DatabaseSchema, AccountTable, StatusTable, GuideTable, GuideItemTable } from "@/lib/db";
+import type { DatabaseSchema, AccountTable, StatusTable, GuideTable, GuideItemTable, FeedArticleTable } from "@/lib/db";
 import { getDb } from "@/lib/db";
 import { getHandle } from "@atproto/common-web";
 import { AtUri } from "@atproto/syntax";
@@ -197,6 +198,19 @@ export async function getGuideBySlug(slug: string) {
     .then((row) => row ?? null);
 }
 
+/** Returns the guide for this author with the given slug, if any (for slug-based deduplication). */
+export async function getGuideByAuthorAndSlug(authorDid: string, slug: string) {
+  const db = getDb();
+  if (!slug?.trim()) return null;
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("authorDid", "=", authorDid)
+    .where("slug", "=", slug.trim())
+    .executeTakeFirst()
+    .then((row) => row ?? null);
+}
+
 export async function getGuideByRkey(rkey: string) {
   const db = getDb();
   if (!rkey.trim()) return null;
@@ -230,6 +244,22 @@ export async function listGuidesByAuthor(authorDid: string, limit = 50) {
     .execute();
 }
 
+/** Guides by any of the given author DIDs (for following feed). */
+export async function listGuidesByAuthorDids(
+  authorDids: string[],
+  limit = 50
+) {
+  const db = getDb();
+  if (!authorDids.length) return [];
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("authorDid", "in", authorDids)
+    .orderBy("indexedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
 export async function insertGuideItem(data: GuideItemTable) {
   await getDb()
     .insertInto("guide_item")
@@ -246,6 +276,9 @@ export async function insertGuideItem(data: GuideItemTable) {
         description: data.description,
         snapshotAt: data.snapshotAt,
         indexedAt: data.indexedAt,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        neighborhoodId: data.neighborhoodId,
       })
     )
     .execute();
@@ -274,4 +307,88 @@ export async function deleteItemsByGuideUri(guideUri: string) {
     .deleteFrom("guide_item")
     .where("guideUri", "=", guideUri)
     .execute();
+}
+
+/** All guide items that have latitude/longitude (for map view). */
+export async function listItemsWithGeo(limit = 500) {
+  const db = getDb();
+  return db
+    .selectFrom("guide_item")
+    .selectAll()
+    .where(sql`latitude IS NOT NULL`)
+    .where(sql`longitude IS NOT NULL`)
+    .orderBy("indexedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
+/** Guides that have at least one item in the given community area (for Phase 4 feeds). */
+export async function listGuidesByNeighborhoodId(
+  neighborhoodId: string,
+  limit = 30
+) {
+  const db = getDb();
+  if (!neighborhoodId.trim()) return [];
+  const uris = await db
+    .selectFrom("guide_item")
+    .select("guideUri")
+    .where("neighborhoodId", "=", neighborhoodId.trim())
+    .distinct()
+    .execute();
+  const guideUris = uris.map((r) => r.guideUri);
+  if (guideUris.length === 0) return [];
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("uri", "in", guideUris)
+    .orderBy("indexedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
+// --- Feed articles (RSS ingest, e.g. Chicago Sun-Times) ---
+
+export async function upsertFeedArticle(data: FeedArticleTable) {
+  await getDb()
+    .insertInto("feed_article")
+    .values(data)
+    .onConflict((oc) =>
+      oc.column("url").doUpdateSet({
+        sourceId: data.sourceId,
+        sourceLabel: data.sourceLabel,
+        title: data.title,
+        description: data.description,
+        publishedAt: data.publishedAt,
+        fetchedAt: data.fetchedAt,
+        neighborhoodId: data.neighborhoodId,
+      })
+    )
+    .execute();
+}
+
+export async function listRecentFeedArticles(limit = 50) {
+  const db = getDb();
+  return db
+    .selectFrom("feed_article")
+    .selectAll()
+    .orderBy("publishedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
+/** Articles with optional neighborhood filter (for community feed). */
+export async function listFeedArticlesByNeighborhoodId(
+  neighborhoodId: string | null,
+  limit = 50
+) {
+  const db = getDb();
+  const query = db
+    .selectFrom("feed_article")
+    .selectAll()
+    .orderBy("publishedAt", "desc")
+    .limit(limit);
+  if (neighborhoodId?.trim()) {
+    return query.where("neighborhoodId", "=", neighborhoodId.trim()).execute();
+  }
+  return query.execute();
 }

@@ -18,6 +18,21 @@ type Main = {
   title?: string
   description?: string
   snapshotAt?: l.DatetimeString
+
+  /**
+   * WGS84 latitude as decimal string for mapping
+   */
+  latitude?: string
+
+  /**
+   * WGS84 longitude as decimal string for mapping
+   */
+  longitude?: string
+
+  /**
+   * Community area or neighborhood identifier (e.g. Agate ID)
+   */
+  neighborhoodId?: string
   createdAt: l.DatetimeString
   updatedAt: l.DatetimeString
 }
@@ -36,6 +51,9 @@ const main = l.record<'tid', Main>(
     title: l.optional(l.string()),
     description: l.optional(l.string()),
     snapshotAt: l.optional(l.string({ format: 'datetime' })),
+    latitude: l.optional(l.string()),
+    longitude: l.optional(l.string()),
+    neighborhoodId: l.optional(l.string()),
     createdAt: l.string({ format: 'datetime' }),
     updatedAt: l.string({ format: 'datetime' }),
   }),

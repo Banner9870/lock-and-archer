@@ -1,26 +1,114 @@
 @import "tailwindcss";
 
+/* Lock & Archer design tokens – see brand/tokens.json and docs/design-standards.md */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --brand-red: #ed0000;
+  --brand-red-dark: #d60000;
+  /* Text */
+  --text-headline: #252525;
+  --text-body: #636466;
+  --text-primary: var(--text-headline);
+  --text-secondary: var(--text-body);
+  /* Surfaces */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --surface: var(--bg-primary);
+  /* Border & shadow */
+  --border-color: #e5e7eb;
+  --outline: var(--border-color);
+  --radius: 6px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.12);
+  /* State colors */
+  --state-success: #10b981;
+  --state-info: #3b82f6;
+  --state-warning: #f59e0b;
+  --state-danger: #ef4444;
+  /* Typography (fonts set in layout via CSS variables) */
+  --font-serif: Charter, Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-source-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  /* Legacy / compatibility */
+  --background: var(--bg-primary);
+  --foreground: var(--text-headline);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-headline: #fafafa;
+    --text-body: #a1a1aa;
+    --text-primary: var(--text-headline);
+    --text-secondary: var(--text-body);
+    --bg-primary: #18181b;
+    --bg-secondary: #09090b;
+    --surface: var(--bg-primary);
+    --border-color: #3f3f46;
+    --outline: var(--border-color);
+    --background: var(--bg-primary);
+    --foreground: var(--text-headline);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-text-headline: var(--text-headline);
+  --color-text-body: var(--text-body);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-surface: var(--surface);
+  --color-border: var(--border-color);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --radius-card: var(--radius-lg);
+  --shadow-card: var(--shadow);
+  --shadow-card-hover: var(--shadow-lg);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Utility: serif headings (use class or apply to h1–h6 in components) */
+.font-heading {
+  font-family: var(--font-serif);
+}
+
+/* Feed card – token-based card style */
+.feed-card {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.feed-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Primary button uses brand red */
+.btn-primary {
+  background: var(--brand-red);
+  color: white;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--brand-red-dark);
+}
+
+/* Link color */
+a.link-brand {
+  color: var(--brand-red);
+}
+
+a.link-brand:hover {
+  color: var(--brand-red-dark);
 }

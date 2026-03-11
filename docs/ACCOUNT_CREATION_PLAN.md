@@ -1,5 +1,7 @@
 # Plan: Create Account flow for Lock and Archer
 
+**Status: Implemented.** This document describes the behaviour and implementation outline; the flow is in place when `PDS_APP_URL` is set.
+
 ## Goal
 
 Let users who don’t have an Atmosphere account or existing PDS **create an account on our PDS** from the app. Keep the flow **simple and test-friendly** so multiple test accounts can be created quickly.

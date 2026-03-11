@@ -24,6 +24,7 @@ export interface DatabaseSchema {
   status: StatusTable;
   guide: GuideTable;
   guide_item: GuideItemTable;
+  feed_article: FeedArticleTable;
 }
 
 interface AuthStateTable {
@@ -75,4 +76,18 @@ export interface GuideItemTable {
   description: string;
   snapshotAt: string;
   indexedAt: string;
+  latitude: number | null;
+  longitude: number | null;
+  neighborhoodId: string | null;
+}
+
+export interface FeedArticleTable {
+  url: string;
+  sourceId: string;
+  sourceLabel: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  fetchedAt: string;
+  neighborhoodId: string | null;
 }

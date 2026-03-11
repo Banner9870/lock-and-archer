@@ -1,7 +1,7 @@
 # Phase 1 & Phase 2 – Implementation Review
 
 **Reviewed:** 2026-03-11  
-**Scope:** Code vs [phase-1-guide-data-model.md](docs/phase-1-guide-data-model.md), [phase-2-guides.md](docs/phase-2-guides.md), [phase-2-implementation.md](docs/phase-2-implementation.md).
+**Scope:** Code vs [phase-1-guide-data-model.md](phase-1-guide-data-model.md), [phase-2-guides.md](phase-2-guides.md), [phase-2-implementation.md](phase-2-implementation.md).
 
 ---
 
@@ -22,29 +22,31 @@
 
 ### Done
 
-- **Lexicons** – `lexicons/com/cpm/guides/guide.json` and `guideItem.json`; `lex build --override --import-ext ""`; `src/lexicons/com.ts` barrel; NSIDs in `lexicons.json`.
-- **DB** – Migration 003: `guide`, `guide_item` tables and indexes; `GuideTable`/`GuideItemTable` in `lib/db/index.ts`; queries: insertGuide, getGuideByUri, getGuideBySlug, getGuideByRkey, listRecentGuides, listGuidesByAuthor, insertGuideItem, listItemsByGuideUri, deleteGuide, deleteGuideItem, deleteItemsByGuideUri.
-- **Webhook** – `app/api/webhook/route.ts` branches on collection; parse + upsert for guide/guideItem; delete guide cascades to items.
-- **OAuth scope** – `lib/auth/client.ts` includes `repo:com.cpm.guides.guide` and `repo:com.cpm.guides.guideItem`.
+- **Lexicons** – `lexicons/com/cpm/guides/guide.json` and `guideItem.json`; codegen; `src/lexicons/com` barrel.
+- **DB** – Migration 003: `guide`, `guide_item`; migrations 004/005 for geo and feed_article. Queries include insertGuide, getGuideByUri, getGuideBySlug, getGuideByRkey, listRecentGuides, listGuidesByAuthor, listGuidesByAuthorDids, insertGuideItem, listItemsByGuideUri, deleteGuide, deleteGuideItem, deleteItemsByGuideUri.
+- **Webhook** – Branches on collection; parse + upsert for guide/guideItem; delete guide cascades to items.
+- **OAuth scope** – `repo:com.cpm.guides.guide` and `repo:com.cpm.guides.guideItem` in `lib/auth/client.ts`.
 - **Config** – `getStaffProperties(did)` in `lib/config.ts`.
-- **API** – POST `/api/guides` (create + write-through), GET `/api/guides` (recent or by authorDid), GET `/api/guides/[slugOrRkey]` (guide + items). Auth via getSession(); 401 when missing.
-- **UI** – Home: Recent guides primary; when logged in: My guides (with empty state), Create a guide, Recent guides; statuses demoted. `/guides` list; `/guides/new` create form; `/guides/[slugOrId]` detail (title, description, author, items list). No “Add item” or “Fork” buttons yet.
+- **API** – POST `/api/guides` (create + write-through), GET `/api/guides` (recent or by authorDid), GET `/api/guides/[slugOrRkey]` (guide + items), POST `/api/guides/[slugOrRkey]/items` (add item; owner only).
+- **UI** – Home: Recent guides primary; when logged in: My guides, Create guide, Recent guides. `/guides` list; `/guides/new` create; `/guides/[slugOrId]` detail with **Add from Agate** and **Add from Chicago Public Library** (owner only). Guide map at `/guides/map`; per-guide map on detail. Items list on detail.
+- **Feeds** – Citywide, community area, **Following** (guides from people you follow); unified feed of guides + Sun-Times articles; `GET /api/feeds/following`, `/feeds/following`.
+- **Blob proxy** – `GET /api/blob?did=&cid=`; `blobProxyUrl`, `resolveDidToPdsUrl`.
+- **Deploy seed** – `pnpm railway-seed` for alice/bob/carol (profiles, avatars, follows, guides).
 
-### Deferred (next pass)
+### Deferred
 
 - **PATCH/DELETE guide** – Not implemented.
-- **POST /api/guides/[guideId]/items** – Add item to guide (not implemented).
-- **DELETE /api/guides/items/[itemUri]** – Not implemented.
+- **DELETE guide item** – Not implemented.
 - **POST /api/guides/fork** – Fork guide + items (not implemented).
-- **Property badges in UI** – `getStaffProperties` exists; list/detail pages do not yet show Chicago Sun-Times / WBEZ / chicago.com badges next to author.
+- **Property badges in UI** – `getStaffProperties` exists; list/detail do not show Chicago Sun-Times / WBEZ / chicago.com badges.
 
 ### PDS / Tap
 
-- **PDS** – If createRecord fails for guide NSIDs, allow-list `com.cpm.guides.guide` and `com.cpm.guides.guideItem` on the PDS (see phase-2-implementation and RAILWAY_DEPLOY).
-- **Tap** – For guides from other users to appear in Recent guides, run Tap with collection filters including these two NSIDs and webhook pointing at this app’s `/api/webhook`.
+- **PDS** – Must accept guide NSIDs; allow-list if required (see phase-2-implementation and RAILWAY_DEPLOY).
+- **Tap** – For guides from other users to appear in Recent guides, run Tap with collection filters for the guide NSIDs and webhook at `/api/webhook`.
 
 ---
 
 ## Summary
 
-The codebase matches Phase 1 data-model and Phase 2 “first slice”: create guide, list recent/my guides, view guide detail, write-through + webhook index. Add item, fork, PATCH/DELETE, and property badge UI are documented and left for the next iteration.
+The codebase matches Phase 1 data model and Phase 2 create/list/view/add-item flow, plus feeds (citywide, community, Following), blob proxy, and deploy-time seed. Fork, PATCH/DELETE guide, DELETE item, and property badge UI remain deferred.

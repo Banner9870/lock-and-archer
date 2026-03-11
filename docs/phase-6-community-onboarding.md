@@ -1,6 +1,6 @@
 # Phase 6 – Community-area onboarding (later)
 
-After community-area feeds exist (Phase 4), we can add **onboarding** so each user’s experience is centered on a community area they choose.
+**Not implemented.** This doc describes a future feature: after community-area feeds exist (Phase 4 ✅), we can add onboarding so each user’s experience is centered on a community area they choose.
 
 ---
 

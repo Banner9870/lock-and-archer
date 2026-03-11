@@ -27,6 +27,13 @@ export function getPdsAppUrlOrNull(): URL | null {
   return getPdsAppUrl();
 }
 
+/** When false (default), Statusphere UI and API are disabled; guides are the primary focus. */
+export function isStatusphereEnabled(): boolean {
+  const raw = process.env.ENABLE_STATUSPHERE?.trim().toLowerCase();
+  if (!raw) return false;
+  return raw === "1" || raw === "true" || raw === "yes" || raw === "on";
+}
+
 export type StaffProperty = "sun-times" | "wbez" | "chicago.com";
 
 function parseDidList(raw: string | undefined): string[] {
