@@ -4,6 +4,7 @@ import type { DatabaseSchema, AccountTable, StatusTable } from "@/lib/db";
 import { getDb } from "@/lib/db";
 import { getHandle } from "@atproto/common-web";
 import { AtUri } from "@atproto/syntax";
+import { resolveDidToHandle } from "@/lib/did-resolve";
 
 export async function getAccountStatus(did: string) {
   const db = getDb();
@@ -95,16 +96,19 @@ export async function getAccountHandle(did: string): Promise<string | null> {
   if (account) return account.handle;
   try {
     const didDoc = await getTap().resolveDid(did);
-    if (!didDoc) return null;
-    return getHandle(didDoc) ?? null;
+    if (didDoc) {
+      const h = getHandle(didDoc);
+      if (h) return h;
+    }
   } catch {
-    return null;
+    // Tap not configured or failed; try direct DID resolution
   }
+  return resolveDidToHandle(did);
 }
 
 export async function getRecentStatuses(limit = 5) {
   const db = getDb();
-  return db
+  const rows = await db
     .selectFrom("status")
     .innerJoin("account", "status.authorDid", "account.did")
     .select([
@@ -120,6 +124,24 @@ export async function getRecentStatuses(limit = 5) {
     .orderBy("status.createdAt", "desc")
     .limit(limit)
     .execute();
+
+  const result: typeof rows = [];
+  for (const row of rows) {
+    let handle = row.handle;
+    if (handle.startsWith("did:")) {
+      const resolved = await resolveDidToHandle(row.authorDid);
+      if (resolved) {
+        handle = resolved;
+        await upsertAccount({
+          did: row.authorDid,
+          handle: resolved,
+          active: 1,
+        });
+      }
+    }
+    result.push({ ...row, handle });
+  }
+  return result;
 }
 
 export async function getTopStatuses(limit = 10) {
