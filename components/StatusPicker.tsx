@@ -1,0 +1,98 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const EMOJIS = [
+  "👍",
+  "👎",
+  "💙",
+  "🔥",
+  "😆",
+  "😢",
+  "🤔",
+  "😴",
+  "🎉",
+  "🤩",
+  "😭",
+  "🥳",
+  "😤",
+  "💀",
+  "✨",
+  "👀",
+  "🙏",
+  "📚",
+  "💻",
+  "🍕",
+  "🌴",
+];
+
+interface StatusPickerProps {
+  currentStatus?: string | null;
+}
+
+export function StatusPicker({ currentStatus }: StatusPickerProps) {
+  const router = useRouter();
+  const [selected, setSelected] = useState<string | null>(currentStatus ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSelect(emoji: string) {
+    setLoading(true);
+    setError(null);
+    setSelected(emoji);
+
+    try {
+      const res = await fetch("/api/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: emoji }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === "string" ? data.error : "Failed to update status"
+        );
+      }
+
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      setError(err instanceof Error ? err.message : "Failed to update status");
+      setSelected(currentStatus ?? null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
+        Set your status
+      </p>
+      {error && (
+        <p className="text-red-500 dark:text-red-400 text-sm mb-3">{error}</p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        {EMOJIS.map((emoji) => (
+          <button
+            key={emoji}
+            onClick={() => handleSelect(emoji)}
+            disabled={loading}
+            className={`text-2xl p-2 rounded-lg transition-all
+              ${
+                selected === emoji
+                  ? "bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500"
+                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              }
+              disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
