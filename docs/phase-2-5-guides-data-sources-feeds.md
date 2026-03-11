@@ -1,6 +1,6 @@
-# Lock & Archer: Guides, Data Sources, and Feeds (Phase 2–5)
+# Lock & Archer: Guides, Data Sources, and Feeds (Phase 2–6)
 
-This document explains how Lock & Archer will use the **AT Protocol** to power guides, data sources (including Agate), and feeds—and how we’ll get there in phases 2–5. It’s written for both non-technical and technical readers.
+This document explains how Lock & Archer will use the **AT Protocol** to power guides, data sources (including Agate), and feeds—and how we’ll get there in phases 2–6. It’s written for both non-technical and technical readers.
 
 ---
 
@@ -22,7 +22,8 @@ Over the next phases we will:
 - **Phase 5 – Custom feeds for power users:**  
   Provide a pattern and example code so technical users can write and deploy custom feeds against the same data, and (optionally) expose them as ATProto “custom feeds” that other clients can consume.
 
----
+- **Phase 6 – Community-area onboarding (later):**  
+  After first-time PDS sign-up or authentication, let users set the community area their experience is centered around. They can enter an address; the app uses [City of Chicago community area boundaries](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6) to resolve it to a community area and then recommend that area’s feed by default.
 
 ## 1. ATProto in Plain Language
 
@@ -138,7 +139,35 @@ Phase 5 makes feeds **first-class and pluggable**:
 
 ---
 
-## 7. Summary by Audience
+## 7. Phase 6 – Community-Area Onboarding (Later)
+
+After community-area feeds exist (Phase 4), we can add **onboarding** so each user’s experience is centered on a community area they choose.
+
+### 7.1 When it runs
+
+- **First-time sign-up or first login** – After PDS authentication (OAuth or create-account flow), if the user has not yet set a community area, prompt them.
+- **Optional “Set your area” in settings** – Users can change their choice later.
+
+### 7.2 Flow
+
+1. **Prompt** – “Where’s your experience centered?” or similar. Offer:
+   - **Enter an address** – User types a Chicago address. The app geocodes it and uses **City of Chicago community area boundaries** to determine which community area contains that point.
+   - **Choose from a list** – Alternatively, let the user pick from the list of [77 community areas](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6) (e.g. Rogers Park, Englewood, Loop).
+2. **Resolve address → community area** – Use the [Boundaries - Community Areas](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6) dataset (or a preprocessed copy): geocode the address to lat/lon, then point-in-polygon against community area boundaries to get the area’s ID or name.
+3. **Store preference** – Save the user’s chosen community area in the app DB (e.g. a `user_preferences` or `account` extension keyed by DID). No need to store this in the PDS unless we later define an app-specific lexicon for preferences.
+4. **Recommend feed** – Default or prominently suggest the feed for that community area (e.g. “Guides for [Rogers Park]”) on the home or feeds page so their experience is locally relevant from the start.
+
+### 7.3 Data and implementation notes
+
+- **Boundaries** – City of Chicago publishes [Boundaries - Community Areas - Map](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6) (GeoJSON or shapefile). The app (or a small service) can load these once and use a point-in-polygon library to resolve (lat, lon) → community area. Align area IDs/names with Agate’s `neighborhoodId` or community-area list so feeds stay consistent.
+- **Geocoding** – Use a geocoder (e.g. City of Chicago geocoding API, or a third-party) to convert address string → coordinates, then run boundary lookup.
+- **Privacy** – Store only the chosen community area (and optionally the address for display), not persistent precise location. Make the step optional so users can skip and still use citywide or manual feed selection.
+
+This phase depends on **Phase 4 (feeds)** and benefits from **Phase 3 (Agate/neighborhoodId)** so that community area IDs are consistent across guides and feeds.
+
+---
+
+## 8. Summary by Audience
 
 **Non-technical**
 
@@ -146,6 +175,7 @@ Phase 5 makes feeds **first-class and pluggable**:
 - **Phase 3:** Guides integrate with Agate; items know neighborhoods and community areas.
 - **Phase 4:** Feeds per community area and citywide so residents and staff see what’s relevant where.
 - **Phase 5:** Technical contributors can write and deploy their own feeds.
+- **Phase 6 (later):** After first sign-up or login, users can set their community area (by address or list); the app uses City of Chicago boundaries to recommend that area’s feed.
 
 **Technical**
 
@@ -156,9 +186,9 @@ Phase 5 makes feeds **first-class and pluggable**:
 
 ---
 
-## 8. Design Standards
+## 9. Design Standards
 
-All UI work for guides, data sources, and feeds should follow **Chicago Local design standards**. Full details (tokens, Bootstrap/utility usage, typography, component patterns, full token JSON) are in:
+All UI work for guides, data sources, and feeds should follow **Lock and Archer design standards**. Full details (tokens, Bootstrap/utility usage, typography, component patterns, full token JSON) are in:
 
 - **[docs/design-standards.md](design-standards.md)**
 
@@ -199,6 +229,13 @@ Each source implements something like `resolveById(sourceId) → { title, descri
 
 - **In-app:** Endpoints like `GET /api/feeds/citywide`, `GET /api/feeds/community/[communityAreaId]` query `guide` and `guide_item`, aggregate and sort.
 - **Custom feed service:** Separate service subscribes to Tap, maintains index, exposes ATProto feed endpoints; can be extended by technical users.
+
+### F. Phase 6 – Community-area onboarding (later)
+
+- **Storage:** Extend `account` table or add `user_preferences` (e.g. `did`, `communityAreaId`, `updatedAt`). Key by DID so we know which feed to recommend after login.
+- **Boundaries:** Use [City of Chicago – Boundaries: Community Areas](https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-Map/cauq-8yn6) (GeoJSON/shapefile). Load once; point-in-polygon (lat, lon) → community area ID/name. Align with Agate’s `neighborhoodId` or community-area list for consistent feeds.
+- **Geocoding:** Address string → coordinates via City of Chicago or third-party geocoder, then boundary lookup.
+- **UX:** Optional step after first auth; “Set your area” in settings to change later. Store only community area (and optionally display address); avoid storing precise location long-term.
 
 ---
 

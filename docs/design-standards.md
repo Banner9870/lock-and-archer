@@ -1,6 +1,6 @@
-# Design Standards – Chicago Local
+# Design Standards – Lock and Archer
 
-These standards apply to Lock & Archer’s Chicago Local UI work. They should inform **all new guide, data-source, and feed UIs** described in the roadmap.
+These standards apply to Lock & Archer’s UI work. They should inform **all new guide, data-source, and feed UIs** described in the roadmap.
 
 > **Critical rule:** Never hardcode hex values in components. Always use CSS variables (or your stack’s design tokens).
 
@@ -122,9 +122,9 @@ These standards apply to Lock & Archer’s Chicago Local UI work. They should in
 
 ---
 
-## 4. Chicago Local token reference (v1)
+## 4. Lock and Archer token reference (v1)
 
-The design system is defined in `brand/tokens.json`. Below is the full **Chicago Local** token set (version 1). Use these tokens (via CSS variables or your stack’s token layer) instead of hardcoding values.
+The design system is defined in `brand/tokens.json`. Below is the full **Lock and Archer** token set (version 1). Use these tokens (via CSS variables or your stack’s token layer) instead of hardcoding values.
 
 ### Quick reference
 
@@ -147,7 +147,7 @@ The design system is defined in `brand/tokens.json`. Below is the full **Chicago
 
 ```json
 {
-  "name": "Chicago Local",
+  "name": "Lock and Archer",
   "version": 1,
   "colors": {
     "brand_red": "#ed0000",
@@ -259,7 +259,7 @@ The design system is defined in `brand/tokens.json`. Below is the full **Chicago
 
 ### Notes
 
-- **`right_rail`**, **`post_types`**, and **`user_roles`** are product/config values used by Chicago Local; reuse or adapt when building guides, feeds, and roles in Lock & Archer.
+- **`right_rail`**, **`post_types`**, and **`user_roles`** are product/config values used by Lock and Archer; reuse or adapt when building guides, feeds, and roles.
 - In CSS/SCSS, expose tokens via `:root` (e.g. `--brand-red: #ed0000`) so the “no hardcoded hex” rule is easy to follow.
 - **Source of truth** for the repo is `brand/tokens.json`; this doc is for reference and onboarding.
 
