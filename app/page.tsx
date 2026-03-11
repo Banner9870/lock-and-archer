@@ -5,12 +5,21 @@ import {
   getTopStatuses,
   getAccountHandle,
 } from "@/lib/db/queries";
+import { isCreateAccountAvailable } from "@/lib/config";
 import { LoginForm } from "@/components/LoginForm";
 import { LogoutButton } from "@/components/LogoutButton";
 import { StatusPicker } from "@/components/StatusPicker";
+import Link from "next/link";
 
-export default async function Home() {
+type HomeProps = {
+  searchParams: Promise<{ account_created?: string }>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
   const session = await getSession();
+  const params = await searchParams;
+  const accountCreated = params.account_created && String(params.account_created).trim() ? String(params.account_created).trim() : undefined;
+
   const [statuses, topStatuses, accountStatus, accountHandle] =
     await Promise.all([
       getRecentStatuses(5),
@@ -18,6 +27,8 @@ export default async function Home() {
       session ? getAccountStatus(session.did) : null,
       session ? getAccountHandle(session.did) : null,
     ]);
+
+  const createAccountAvailable = isCreateAccountAvailable();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
@@ -43,7 +54,20 @@ export default async function Home() {
           </div>
         ) : (
           <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 mb-6">
-            <LoginForm />
+            {accountCreated && (
+              <p className="mb-4 text-sm text-green-600 dark:text-green-400">
+                Account created. Sign in with your new handle below.
+              </p>
+            )}
+            <LoginForm defaultHandle={accountCreated} />
+            {createAccountAvailable && (
+              <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                Don&apos;t have an account?{" "}
+                <Link href="/create-account" className="text-blue-600 dark:text-blue-400 hover:underline">
+                  Create one
+                </Link>
+              </p>
+            )}
           </div>
         )}
 

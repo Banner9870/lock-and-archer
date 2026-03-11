@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Pre-fill handle after account creation redirect */
+  defaultHandle?: string;
+};
+
+export function LoginForm({ defaultHandle }: LoginFormProps) {
   const [handle, setHandle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (defaultHandle) setHandle(defaultHandle);
+  }, [defaultHandle]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
