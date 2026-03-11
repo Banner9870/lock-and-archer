@@ -16,6 +16,8 @@
     "@atproto/oauth-client-node": "^0.3.17",
     "@atproto/syntax": "^0.5.0",
     "@atproto/tap": "^0.2.8",
+    "@atproto-labs/handle-resolver": "^0.3.6",
+    "@atproto-labs/handle-resolver-node": "^0.1.25",
     "better-sqlite3": "^12.6.2",
     "go": "^3.0.1",
     "kysely": "^0.28.11",
