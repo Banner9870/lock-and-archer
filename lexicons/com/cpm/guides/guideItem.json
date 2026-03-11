@@ -1,0 +1,27 @@
+{
+  "id": "com.cpm.guides.guideItem",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": ["guideRef", "type", "createdAt", "updatedAt"],
+        "properties": {
+          "guideRef": { "type": "string" },
+          "type": { "type": "string", "enum": ["article", "event", "business"] },
+          "sourceId": { "type": "string" },
+          "sourceUrl": { "type": "string" },
+          "sourceLabel": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "snapshotAt": { "type": "string", "format": "datetime" },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "updatedAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

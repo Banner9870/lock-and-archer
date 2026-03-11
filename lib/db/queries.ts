@@ -1,6 +1,6 @@
 import type { Transaction } from "kysely";
 import { getTap } from "@/lib/tap";
-import type { DatabaseSchema, AccountTable, StatusTable } from "@/lib/db";
+import type { DatabaseSchema, AccountTable, StatusTable, GuideTable, GuideItemTable } from "@/lib/db";
 import { getDb } from "@/lib/db";
 import { getHandle } from "@atproto/common-web";
 import { AtUri } from "@atproto/syntax";
@@ -155,4 +155,123 @@ export async function getTopStatuses(limit = 10) {
     .limit(limit)
     .execute();
   return rows as { status: string; count: string }[];
+}
+
+export async function insertGuide(data: GuideTable) {
+  await getDb()
+    .insertInto("guide")
+    .values(data)
+    .onConflict((oc) =>
+      oc.column("uri").doUpdateSet({
+        authorDid: data.authorDid,
+        title: data.title,
+        description: data.description,
+        slug: data.slug,
+        forkedFrom: data.forkedFrom,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        indexedAt: data.indexedAt,
+      })
+    )
+    .execute();
+}
+
+export async function getGuideByUri(uri: string) {
+  const db = getDb();
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("uri", "=", uri)
+    .executeTakeFirst()
+    .then((row) => row ?? null);
+}
+
+export async function getGuideBySlug(slug: string) {
+  const db = getDb();
+  if (!slug.trim()) return null;
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("slug", "=", slug.trim())
+    .executeTakeFirst()
+    .then((row) => row ?? null);
+}
+
+export async function getGuideByRkey(rkey: string) {
+  const db = getDb();
+  if (!rkey.trim()) return null;
+  const suffix = `/${rkey.trim()}`;
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("uri", "like", `%${suffix}`)
+    .executeTakeFirst()
+    .then((row) => row ?? null);
+}
+
+export async function listRecentGuides(limit = 20) {
+  const db = getDb();
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .orderBy("indexedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
+export async function listGuidesByAuthor(authorDid: string, limit = 50) {
+  const db = getDb();
+  return db
+    .selectFrom("guide")
+    .selectAll()
+    .where("authorDid", "=", authorDid)
+    .orderBy("updatedAt", "desc")
+    .limit(limit)
+    .execute();
+}
+
+export async function insertGuideItem(data: GuideItemTable) {
+  await getDb()
+    .insertInto("guide_item")
+    .values(data)
+    .onConflict((oc) =>
+      oc.column("uri").doUpdateSet({
+        guideUri: data.guideUri,
+        authorDid: data.authorDid,
+        type: data.type,
+        sourceId: data.sourceId,
+        sourceUrl: data.sourceUrl,
+        sourceLabel: data.sourceLabel,
+        title: data.title,
+        description: data.description,
+        snapshotAt: data.snapshotAt,
+        indexedAt: data.indexedAt,
+      })
+    )
+    .execute();
+}
+
+export async function listItemsByGuideUri(guideUri: string) {
+  const db = getDb();
+  return db
+    .selectFrom("guide_item")
+    .selectAll()
+    .where("guideUri", "=", guideUri)
+    .orderBy("indexedAt", "asc")
+    .execute();
+}
+
+export async function deleteGuide(uri: string) {
+  await getDb().deleteFrom("guide").where("uri", "=", uri).execute();
+}
+
+export async function deleteGuideItem(uri: string) {
+  await getDb().deleteFrom("guide_item").where("uri", "=", uri).execute();
+}
+
+export async function deleteItemsByGuideUri(guideUri: string) {
+  await getDb()
+    .deleteFrom("guide_item")
+    .where("guideUri", "=", guideUri)
+    .execute();
 }

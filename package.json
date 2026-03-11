@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "pnpm migrate && next dev",
     "build": "next build",
+    "lex": "lex build --override --import-ext \"\"",
     "start": "pnpm migrate && next start -p ${PORT:-3000} -H 0.0.0.0",
     "lint": "eslint",
     "migrate": "tsx scripts/migrate.ts",

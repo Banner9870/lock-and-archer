@@ -1,7 +1,9 @@
 {
   "version": 1,
   "lexicons": [
-    "xyz.statusphere.status"
+    "xyz.statusphere.status",
+    "com.cpm.guides.guide",
+    "com.cpm.guides.guideItem"
   ],
   "resolutions": {
     "xyz.statusphere.status": {

@@ -15,7 +15,7 @@ import { AtprotoHandleResolverNode } from "@atproto-labs/handle-resolver-node";
 
 import { getDb } from "@/lib/db";
 
-export const SCOPE = "atproto repo:xyz.statusphere.status";
+export const SCOPE = "atproto repo:xyz.statusphere.status repo:com.cpm.guides.guide repo:com.cpm.guides.guideItem";
 
 let client: NodeOAuthClient | null = null;
 

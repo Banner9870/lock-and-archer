@@ -1,0 +1,23 @@
+{
+  "id": "com.cpm.guides.guide",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": ["title", "createdAt", "updatedAt"],
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "slug": { "type": "string" },
+          "forkedFrom": { "type": "string" },
+          "createdAt": { "type": "string", "format": "datetime" },
+          "updatedAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

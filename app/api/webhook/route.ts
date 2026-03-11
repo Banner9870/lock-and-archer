@@ -6,8 +6,14 @@ import {
   insertStatus,
   deleteStatus,
   deleteAccount,
+  insertGuide,
+  insertGuideItem,
+  deleteGuide,
+  deleteGuideItem,
+  deleteItemsByGuideUri,
 } from "@/lib/db/queries";
 import * as xyz from "@/src/lexicons/xyz";
+import * as com from "@/src/lexicons/com";
 
 const TAP_ADMIN_PASSWORD = process.env.TAP_ADMIN_PASSWORD;
 
@@ -46,23 +52,70 @@ export async function POST(request: NextRequest) {
       if (!evt.record) {
         return NextResponse.json({ success: false });
       }
-      let record: xyz.statusphere.status.Main;
-      try {
-        record = xyz.statusphere.status.$parse(evt.record);
-      } catch {
-        return NextResponse.json({ success: false });
-      }
 
-      await insertStatus({
-        uri: uri.toString(),
-        authorDid: evt.did,
-        status: record.status,
-        createdAt: record.createdAt,
-        indexedAt: new Date().toISOString(),
-        current: 1,
-      });
+      if (evt.collection === "xyz.statusphere.status") {
+        let record: xyz.statusphere.status.Main;
+        try {
+          record = xyz.statusphere.status.$parse(evt.record);
+        } catch {
+          return NextResponse.json({ success: false });
+        }
+        await insertStatus({
+          uri: uri.toString(),
+          authorDid: evt.did,
+          status: record.status,
+          createdAt: record.createdAt,
+          indexedAt: new Date().toISOString(),
+          current: 1,
+        });
+      } else if (evt.collection === "com.cpm.guides.guide") {
+        let record: com.cpm.guides.guide.Main;
+        try {
+          record = com.cpm.guides.guide.$parse(evt.record);
+        } catch {
+          return NextResponse.json({ success: false });
+        }
+        await insertGuide({
+          uri: uri.toString(),
+          authorDid: evt.did,
+          title: record.title,
+          description: record.description ?? "",
+          slug: record.slug ?? "",
+          forkedFrom: record.forkedFrom ?? "",
+          createdAt: record.createdAt,
+          updatedAt: record.updatedAt,
+          indexedAt: new Date().toISOString(),
+        });
+      } else if (evt.collection === "com.cpm.guides.guideItem") {
+        let record: com.cpm.guides.guideItem.Main;
+        try {
+          record = com.cpm.guides.guideItem.$parse(evt.record);
+        } catch {
+          return NextResponse.json({ success: false });
+        }
+        await insertGuideItem({
+          uri: uri.toString(),
+          guideUri: record.guideRef,
+          authorDid: evt.did,
+          type: record.type,
+          sourceId: record.sourceId ?? "",
+          sourceUrl: record.sourceUrl ?? "",
+          sourceLabel: record.sourceLabel ?? "",
+          title: record.title ?? "",
+          description: record.description ?? "",
+          snapshotAt: record.snapshotAt ?? "",
+          indexedAt: new Date().toISOString(),
+        });
+      }
     } else if (evt.action === "delete") {
-      await deleteStatus(uri);
+      if (evt.collection === "xyz.statusphere.status") {
+        await deleteStatus(uri);
+      } else if (evt.collection === "com.cpm.guides.guide") {
+        await deleteItemsByGuideUri(uri.toString());
+        await deleteGuide(uri.toString());
+      } else if (evt.collection === "com.cpm.guides.guideItem") {
+        await deleteGuideItem(uri.toString());
+      }
     }
   }
 

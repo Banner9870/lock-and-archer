@@ -26,3 +26,25 @@ export function getPdsHostnameForSignup(): string | null {
 export function getPdsAppUrlOrNull(): URL | null {
   return getPdsAppUrl();
 }
+
+export type StaffProperty = "sun-times" | "wbez" | "chicago.com";
+
+function parseDidList(raw: string | undefined): string[] {
+  if (!raw?.trim()) return [];
+  return raw
+    .split(/[\s,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** Returns which staff property lists contain the given DID. Used for property badges in the UI. */
+export function getStaffProperties(did: string): StaffProperty[] {
+  const out: StaffProperty[] = [];
+  const sunTimes = parseDidList(process.env.SUN_TIMES_STAFF_DIDS);
+  const wbez = parseDidList(process.env.WBEZ_STAFF_DIDS);
+  const chicagoCom = parseDidList(process.env.CHICAGO_COM_STAFF_DIDS);
+  if (sunTimes.includes(did)) out.push("sun-times");
+  if (wbez.includes(did)) out.push("wbez");
+  if (chicagoCom.includes(did)) out.push("chicago.com");
+  return out;
+}

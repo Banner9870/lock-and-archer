@@ -51,6 +51,62 @@ const migrations: Record<string, Migration> = {
       await db.schema.dropTable("account").execute();
     },
   },
+  "003": {
+    async up(db: Kysely<unknown>) {
+      await db.schema
+        .createTable("guide")
+        .addColumn("uri", "text", (col) => col.primaryKey())
+        .addColumn("authorDid", "text", (col) => col.notNull())
+        .addColumn("title", "text", (col) => col.notNull())
+        .addColumn("description", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("slug", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("forkedFrom", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("createdAt", "text", (col) => col.notNull())
+        .addColumn("updatedAt", "text", (col) => col.notNull())
+        .addColumn("indexedAt", "text", (col) => col.notNull())
+        .execute();
+
+      await db.schema
+        .createTable("guide_item")
+        .addColumn("uri", "text", (col) => col.primaryKey())
+        .addColumn("guideUri", "text", (col) => col.notNull())
+        .addColumn("authorDid", "text", (col) => col.notNull())
+        .addColumn("type", "text", (col) => col.notNull())
+        .addColumn("sourceId", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("sourceUrl", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("sourceLabel", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("title", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("description", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("snapshotAt", "text", (col) => col.notNull().defaultTo(""))
+        .addColumn("indexedAt", "text", (col) => col.notNull())
+        .execute();
+
+      await db.schema
+        .createIndex("guide_indexed_at_idx")
+        .on("guide")
+        .column("indexedAt")
+        .execute();
+      await db.schema
+        .createIndex("guide_author_did_idx")
+        .on("guide")
+        .column("authorDid")
+        .execute();
+      await db.schema
+        .createIndex("guide_slug_idx")
+        .on("guide")
+        .column("slug")
+        .execute();
+      await db.schema
+        .createIndex("guide_item_guide_uri_idx")
+        .on("guide_item")
+        .column("guideUri")
+        .execute();
+    },
+    async down(db: Kysely<unknown>) {
+      await db.schema.dropTable("guide_item").execute();
+      await db.schema.dropTable("guide").execute();
+    },
+  },
 };
 
 export function getMigrator() {
