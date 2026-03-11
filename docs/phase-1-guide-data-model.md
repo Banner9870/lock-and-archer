@@ -14,7 +14,7 @@
 | **Data sources** | External APIs for places, events, etc. Specific sources to be supplied per type. |
 | **Where guides live** | In the PDS of each author (by DID). CPM reporters have their own DIDs; their guides live in their repos. No separate “CPM repo.” |
 | **Fork chain** | Any user can fork any guide → new guide in forker’s repo. Fork-of-fork is supported (reporter → user → user). |
-| **CPM label** | App maintains a config list of CPM staff DIDs; guides authored by those DIDs display a “CPM” / “Chicago Public Media” badge. |
+| **Property badges** | App maintains config lists of staff DIDs per property (Chicago Sun-Times, WBEZ, chicago.com); guides authored by those DIDs display the corresponding property badge(s). |
 | **Item storage** | Hybrid: store a **reference** (e.g. URL or external API ID) plus a **cached snapshot** (title, description, etc.) at add-to-guide time; refresh from source when needed for display or staleness. |
 
 ---
@@ -31,7 +31,7 @@
   - `createdAt` (datetime)
   - `updatedAt` (datetime)
 
-CPM vs user is **not** a field on the record; it’s determined by whether the author’s DID is in the app’s CPM DID list.
+Staff vs user is **not** a field on the record; it’s determined by whether the author’s DID is in the app’s staff DID lists for one or more properties (Sun-Times, WBEZ, chicago.com).
 
 ---
 
@@ -100,10 +100,10 @@ All items share:
 
 ---
 
-## 6. CPM badge
+## 6. Property badges
 
-- **Config:** e.g. `CPM_STAFF_DIDS` (comma- or newline-separated list of DIDs) in app config / env.
-- **At read time:** When displaying a guide, if `authorDid` is in that list, show “CPM” / “Chicago Public Media” label. No change to lexicon or PDS.
+- **Config:** Three env vars, e.g. `SUN_TIMES_STAFF_DIDS`, `WBEZ_STAFF_DIDS`, `CHICAGO_COM_STAFF_DIDS` (each comma- or newline-separated list of DIDs).
+- **At read time:** When displaying a guide, if `authorDid` is in one or more of these lists, show the corresponding badge(s): “Chicago Sun-Times”, “WBEZ”, “chicago.com”. No change to lexicon or PDS.
 
 ---
 
