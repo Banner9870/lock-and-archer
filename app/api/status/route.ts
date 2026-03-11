@@ -3,6 +3,7 @@ import { Client, l } from "@atproto/lex";
 import { getSession } from "@/lib/auth/session";
 import { getOAuthClient } from "@/lib/auth/client";
 import * as xyz from "@/src/lexicons/xyz";
+import { insertStatus, upsertAccount, getAccountHandle } from "@/lib/db/queries";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -34,6 +35,24 @@ export async function POST(request: NextRequest) {
     const res = await lexClient.create(xyz.statusphere.status.main, {
       status,
       createdAt,
+    });
+
+    // Write-through: so this status shows in Recent immediately without waiting for Tap.
+    // Tap will still send events and we'll upsert; this ensures the feed isn't empty when Tap isn't configured.
+    const handle =
+      (await getAccountHandle(session.did)) ?? session.did;
+    await upsertAccount({
+      did: session.did,
+      handle,
+      active: 1,
+    });
+    await insertStatus({
+      uri: res.uri,
+      authorDid: session.did,
+      status,
+      createdAt,
+      indexedAt: new Date().toISOString(),
+      current: 1,
     });
 
     return NextResponse.json({

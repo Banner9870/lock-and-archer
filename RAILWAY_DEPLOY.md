@@ -80,3 +80,22 @@ The PDS service is failing. On the **PDS** Railway service (not this app):
 1. **`PDS_HOSTNAME` must be hostname only** — e.g. `lock-and-archer-pds-production.up.railway.app`. Do **not** include `https://`. Including the scheme causes the PDS to crash on startup (ZodError: "Issuer URL must be in the canonical form").
 2. Open the PDS service **Deployments** or **Logs** and check the error message on startup.
 3. Ensure a volume is attached at `/pds` and required env vars are set (`PDS_JWT_SECRET`, `PDS_ADMIN_PASSWORD`, `PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX`). See the PDS repo README.
+
+### Recent feed is empty or only shows your own status
+
+The **Recent** and **Top Statuses** feeds are filled in two ways:
+
+1. **Write-through** — When you set a status in the app, that status (and your account) are written into the app database immediately, so your own updates show up right away.
+2. **Tap (firehose)** — To see statuses from **other** users, a [Tap](https://atproto.com/guides/backfilling#using-tap) instance must be running and sending events to your app’s webhook. Tap subscribes to the AT Protocol firehose and forwards `xyz.statusphere.status` record and identity events to your app.
+
+If you only see your own status in Recent, Tap is not configured for production. To fix:
+
+- Run Tap somewhere (e.g. a separate Railway service or a VPS) with your **production** webhook URL and collection filter:
+  ```bash
+  tap run \
+    --webhook-url=https://YOUR-APP.up.railway.app/api/webhook \
+    --collection-filters=xyz.statusphere.status \
+    --signal-collection=xyz.statusphere.status
+  ```
+- Optional: set `TAP_ADMIN_PASSWORD` on this app and pass it when starting Tap so webhook requests are authenticated.
+- Add the Tap admin password to the webhook URL or configure Tap to send it in the `Authorization` header (see Tap docs). Then statuses from anyone on the network who uses Statusphere will flow into your app and appear in Recent and Top Statuses.
