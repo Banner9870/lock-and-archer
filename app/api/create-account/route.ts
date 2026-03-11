@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
   const handle = typeof body.handle === "string" ? body.handle.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
-  const email = typeof body.email === "string" ? body.email.trim() : undefined;
+  const emailInput = typeof body.email === "string" ? body.email.trim() : "";
 
   if (!handle || !password) {
     return NextResponse.json(
@@ -46,11 +46,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // PDS may require email; use a placeholder when omitted so signup works without email (testing).
+  const email = emailInput || `${handle.replace(/\./g, "-")}@placeholder.invalid`;
+
   const createAccountUrl = new URL("/xrpc/com.atproto.server.createAccount", pdsUrl);
   const res = await fetch(createAccountUrl.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ handle, password, ...(email && { email }) }),
+    body: JSON.stringify({ handle, password, email }),
   });
 
   const data = await res.json().catch(() => ({}));
